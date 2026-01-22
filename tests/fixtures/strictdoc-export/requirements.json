@@ -1,0 +1,69 @@
+{
+  "document": {
+    "uid": "SAMPLE-DOC",
+    "title": "Sample Safety Requirements",
+    "sections": [
+      {
+        "uid": "HAZ-001",
+        "title": "Missing CAM message not detected",
+        "statement": "Missing CAM message not detected within timeout period",
+        "node_type": "REQUIREMENT",
+        "custom_fields": {
+          "ASIL": "ASIL_B",
+          "SEVERITY": "S2",
+          "EXPOSURE": "E3",
+          "CONTROLLABILITY": "C2"
+        },
+        "relations": []
+      },
+      {
+        "uid": "SG-001",
+        "title": "CAM message timeout detection",
+        "statement": "Ensure CAM message reception is monitored with timeout detection",
+        "node_type": "REQUIREMENT",
+        "custom_fields": {
+          "ASIL": "ASIL_B"
+        },
+        "relations": [
+          {"type": "Parent", "uid": "HAZ-001"}
+        ]
+      },
+      {
+        "uid": "SSR-001",
+        "title": "Timer scheduling",
+        "statement": "cam-service shall schedule a per-event timer that triggers a safety violation if the next event is not received within 1000ms",
+        "node_type": "REQUIREMENT",
+        "custom_fields": {
+          "ASIL": "ASIL_B"
+        },
+        "relations": [
+          {"type": "Parent", "uid": "SG-001"}
+        ]
+      },
+      {
+        "uid": "SSR-002",
+        "title": "Timer cancellation",
+        "statement": "cam-service shall cancel the timer when a valid event is received",
+        "node_type": "REQUIREMENT",
+        "custom_fields": {
+          "ASIL": "ASIL_B"
+        },
+        "relations": [
+          {"type": "Parent", "uid": "SG-001"}
+        ]
+      },
+      {
+        "uid": "TC-001",
+        "title": "Test timer trigger",
+        "statement": "Verify timer triggers on missing CAM message",
+        "node_type": "REQUIREMENT",
+        "custom_fields": {
+          "ASIL": "ASIL_B"
+        },
+        "relations": [
+          {"type": "Parent", "uid": "SSR-001"}
+        ]
+      }
+    ]
+  }
+}

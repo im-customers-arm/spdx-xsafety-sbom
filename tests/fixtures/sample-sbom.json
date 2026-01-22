@@ -1,0 +1,89 @@
+{
+  "@context": [
+    "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
+    {"xSafety": "https://example.org/spdx-extensions/xSafety/"}
+  ],
+  "@graph": [
+    {
+      "@type": "SpdxDocument",
+      "spdxId": "urn:spdx:example:document-sample-sbom",
+      "name": "sample-sbom",
+      "specVersion": "3.0.1",
+      "creationInfo": {
+        "type": "CreationInfo",
+        "specVersion": "3.0.1",
+        "created": "2025-01-01T00:00:00Z",
+        "createdBy": ["urn:spdx:example:tool-test"],
+        "createdUsing": ["urn:spdx:example:tool-test"]
+      },
+      "namespaceMap": [
+        {"prefix": "xSafety", "namespace": "https://example.org/spdx-extensions/xSafety/"}
+      ],
+      "rootElement": ["urn:spdx:example:element-HAZ-001"],
+      "element": [
+        "urn:spdx:example:element-HAZ-001",
+        "urn:spdx:example:element-SG-001",
+        "urn:spdx:example:element-SSR-001"
+      ]
+    },
+    {
+      "@type": "Tool",
+      "spdxId": "urn:spdx:example:tool-test",
+      "name": "test-tool",
+      "description": "Test tool for validation"
+    },
+    {
+      "@type": "Bundle",
+      "spdxId": "urn:spdx:example:element-HAZ-001",
+      "name": "HAZ-001",
+      "description": "Missing CAM message not detected",
+      "primaryPurpose": "requirement",
+      "extension": [{
+        "type": "xSafety:HazardExtension",
+        "xSafety:severity": "s2",
+        "xSafety:exposure": "e3",
+        "xSafety:controllability": "c2",
+        "xSafety:safetyIntegrityLevel": "asilB"
+      }]
+    },
+    {
+      "@type": "Bundle",
+      "spdxId": "urn:spdx:example:element-SG-001",
+      "name": "SG-001",
+      "description": "Ensure CAM message reception is monitored with timeout detection",
+      "primaryPurpose": "requirement",
+      "extension": [{
+        "type": "xSafety:SafetyGoalExtension",
+        "xSafety:safetyIntegrityLevel": "asilB"
+      }]
+    },
+    {
+      "@type": "Bundle",
+      "spdxId": "urn:spdx:example:element-SSR-001",
+      "name": "SSR-001",
+      "description": "cam-service shall schedule a per-event timer",
+      "primaryPurpose": "requirement",
+      "extension": [{
+        "type": "xSafety:SafetyRequirementExtension",
+        "xSafety:requirementType": "softwareSafetyRequirement",
+        "xSafety:safetyIntegrityLevel": "asilB"
+      }]
+    },
+    {
+      "@type": "Relationship",
+      "spdxId": "urn:spdx:example:relationship-rel-1",
+      "relationshipType": "descendantOf",
+      "from": "urn:spdx:example:element-SG-001",
+      "to": ["urn:spdx:example:element-HAZ-001"],
+      "comment": "SG-001 derived from HAZ-001"
+    },
+    {
+      "@type": "Relationship",
+      "spdxId": "urn:spdx:example:relationship-rel-2",
+      "relationshipType": "descendantOf",
+      "from": "urn:spdx:example:element-SSR-001",
+      "to": ["urn:spdx:example:element-SG-001"],
+      "comment": "SSR-001 derived from SG-001"
+    }
+  ]
+}

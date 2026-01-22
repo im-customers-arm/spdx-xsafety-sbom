@@ -1,0 +1,214 @@
+# xSafety Extension SHACL Shapes
+# Version: 2.1.0
+# Validates SPDX 3.0.1 elements with xSafety extension data
+
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xSafety: <https://example.org/spdx-extensions/xSafety/> .
+@prefix spdx: <https://spdx.org/rdf/3.0.1/terms/Core/> .
+
+# ==============================================================================
+# HazardExtension Shape
+# ==============================================================================
+
+xSafety:HazardExtensionShape
+    a sh:NodeShape ;
+    sh:targetClass xSafety:HazardExtension ;
+    sh:property [
+        sh:path xSafety:severity ;
+        sh:maxCount 1 ;
+        sh:in ( xSafety:s0 xSafety:s1 xSafety:s2 xSafety:s3 ) ;
+        sh:message "xSafety:severity must be one of: s0, s1, s2, s3" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:exposure ;
+        sh:maxCount 1 ;
+        sh:in ( xSafety:e0 xSafety:e1 xSafety:e2 xSafety:e3 xSafety:e4 ) ;
+        sh:message "xSafety:exposure must be one of: e0, e1, e2, e3, e4" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:controllability ;
+        sh:maxCount 1 ;
+        sh:in ( xSafety:c0 xSafety:c1 xSafety:c2 xSafety:c3 ) ;
+        sh:message "xSafety:controllability must be one of: c0, c1, c2, c3" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:safetyIntegrityLevel ;
+        sh:maxCount 1 ;
+        sh:in ( 
+            xSafety:asilA xSafety:asilB xSafety:asilC xSafety:asilD xSafety:qm
+            xSafety:sil1 xSafety:sil2 xSafety:sil3 xSafety:sil4
+            xSafety:dalA xSafety:dalB xSafety:dalC xSafety:dalD
+        ) ;
+        sh:message "xSafety:safetyIntegrityLevel must be a valid SIL/ASIL/DAL value" ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ==============================================================================
+# SafetyGoalExtension Shape
+# ==============================================================================
+
+xSafety:SafetyGoalExtensionShape
+    a sh:NodeShape ;
+    sh:targetClass xSafety:SafetyGoalExtension ;
+    sh:property [
+        sh:path xSafety:safetyIntegrityLevel ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( 
+            xSafety:asilA xSafety:asilB xSafety:asilC xSafety:asilD xSafety:qm
+            xSafety:sil1 xSafety:sil2 xSafety:sil3 xSafety:sil4
+            xSafety:dalA xSafety:dalB xSafety:dalC xSafety:dalD
+        ) ;
+        sh:message "SafetyGoalExtension requires exactly one valid safetyIntegrityLevel" ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ==============================================================================
+# SafetyExtension Shape
+# ==============================================================================
+
+xSafety:SafetyExtensionShape
+    a sh:NodeShape ;
+    sh:targetClass xSafety:SafetyExtension ;
+    sh:property [
+        sh:path xSafety:safetyRelevant ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "xSafety:safetyRelevant must be a boolean" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:safetyIntegrityLevel ;
+        sh:maxCount 1 ;
+        sh:in ( 
+            xSafety:asilA xSafety:asilB xSafety:asilC xSafety:asilD xSafety:qm
+            xSafety:sil1 xSafety:sil2 xSafety:sil3 xSafety:sil4
+            xSafety:dalA xSafety:dalB xSafety:dalC xSafety:dalD
+        ) ;
+        sh:message "xSafety:safetyIntegrityLevel must be a valid SIL/ASIL/DAL value" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:complianceStatus ;
+        sh:maxCount 1 ;
+        sh:in ( 
+            xSafety:compliant xSafety:partiallyCompliant xSafety:nonCompliant 
+            xSafety:underReview xSafety:notApplicable xSafety:noAssertion
+        ) ;
+        sh:message "xSafety:complianceStatus must be a valid compliance status" ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ==============================================================================
+# SafetyRequirementExtension Shape
+# ==============================================================================
+
+xSafety:SafetyRequirementExtensionShape
+    a sh:NodeShape ;
+    sh:targetClass xSafety:SafetyRequirementExtension ;
+    sh:property [
+        sh:path xSafety:requirementType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( 
+            xSafety:technicalSafetyRequirement 
+            xSafety:softwareSafetyRequirement 
+            xSafety:hardwareSafetyRequirement 
+            xSafety:functional
+        ) ;
+        sh:message "SafetyRequirementExtension requires exactly one valid requirementType" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:safetyIntegrityLevel ;
+        sh:maxCount 1 ;
+        sh:in ( 
+            xSafety:asilA xSafety:asilB xSafety:asilC xSafety:asilD xSafety:qm
+            xSafety:sil1 xSafety:sil2 xSafety:sil3 xSafety:sil4
+            xSafety:dalA xSafety:dalB xSafety:dalC xSafety:dalD
+        ) ;
+        sh:message "xSafety:safetyIntegrityLevel must be a valid SIL/ASIL/DAL value" ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ==============================================================================
+# SafetyEvidenceExtension Shape
+# ==============================================================================
+
+xSafety:SafetyEvidenceExtensionShape
+    a sh:NodeShape ;
+    sh:targetClass xSafety:SafetyEvidenceExtension ;
+    sh:property [
+        sh:path xSafety:evidenceType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( 
+            xSafety:testReport xSafety:testResult xSafety:reviewReport 
+            xSafety:analysisReport xSafety:certificationReport xSafety:auditReport 
+            xSafety:traceabilityMatrix xSafety:complianceStatement
+        ) ;
+        sh:message "SafetyEvidenceExtension requires exactly one valid evidenceType" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:evidenceResult ;
+        sh:maxCount 1 ;
+        sh:in ( xSafety:pass xSafety:fail xSafety:partial xSafety:inconclusive xSafety:notApplicable ) ;
+        sh:message "xSafety:evidenceResult must be a valid result value" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:validUntil ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:dateTime ;
+        sh:message "xSafety:validUntil must be a valid dateTime" ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ==============================================================================
+# SafetyTestExtension Shape
+# ==============================================================================
+
+xSafety:SafetyTestExtensionShape
+    a sh:NodeShape ;
+    sh:targetClass xSafety:SafetyTestExtension ;
+    sh:property [
+        sh:path xSafety:testType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( 
+            xSafety:unitTest xSafety:integrationTest xSafety:systemTest 
+            xSafety:validationTest xSafety:regressionTest xSafety:faultInjectionTest 
+            xSafety:hardwareInLoopTest xSafety:softwareInLoopTest xSafety:modelInLoopTest
+        ) ;
+        sh:message "SafetyTestExtension requires exactly one valid testType" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:testSteps ;
+        sh:datatype xsd:string ;
+        sh:message "xSafety:testSteps must be a string" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:expectedResult ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "xSafety:expectedResult must be a string" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:safetyIntegrityLevel ;
+        sh:maxCount 1 ;
+        sh:in ( 
+            xSafety:asilA xSafety:asilB xSafety:asilC xSafety:asilD xSafety:qm
+            xSafety:sil1 xSafety:sil2 xSafety:sil3 xSafety:sil4
+            xSafety:dalA xSafety:dalB xSafety:dalC xSafety:dalD
+        ) ;
+        sh:message "xSafety:safetyIntegrityLevel must be a valid SIL/ASIL/DAL value" ;
+        sh:severity sh:Violation ;
+    ] .
