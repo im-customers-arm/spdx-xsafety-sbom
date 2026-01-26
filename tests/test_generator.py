@@ -147,5 +147,5 @@ class TestGenerateDesignSbom:
         )
 
         assert result.success
-        assert result.generation_time > 0
+        assert result.generation_time >= 0  # Can be 0.0 if generation is very fast
         assert result.timestamp is not None

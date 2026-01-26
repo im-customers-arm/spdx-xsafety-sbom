@@ -53,6 +53,20 @@ uv sync
 uv sync --extra validation
 ```
 
+### Install with Native StrictDoc Parsing (Recommended)
+
+When installed with the `strictdoc` extra, the tool uses StrictDoc's native library
+for parsing `.sdoc` files directly, eliminating the need for JSON export:
+
+```bash
+uv sync --extra strictdoc
+```
+
+This enables:
+- **Native `.sdoc` parsing** using StrictDoc's `SDReader` (tree-sitter based)
+- **Native source traceability** using StrictDoc's `SourceFileTraceabilityReader`
+- Automatic fallback to JSON/regex parsing when StrictDoc is not installed
+
 ### Install All Extras (Development)
 
 ```bash
@@ -63,12 +77,26 @@ uv sync --extra all
 
 ### Generate Design SBOM
 
+From StrictDoc JSON export (default):
+
 ```bash
 uv run spdx-xsafety-sbom generate \
     --source-root /path/to/project \
     --strictdoc-dir /path/to/strictdoc-json \
     --output design-sbom.json
 ```
+
+From native `.sdoc` files (when installed with `strictdoc` extra):
+
+```bash
+uv run spdx-xsafety-sbom generate \
+    --source-root /path/to/project \
+    --strictdoc-dir /path/to/strictdoc-docs \
+    --output design-sbom.json
+```
+
+The tool automatically detects whether to use native parsing (for `.sdoc` files)
+or JSON parsing based on the file types found in the directory.
 
 ### Validate Existing SBOM
 
@@ -122,18 +150,19 @@ spdx-xsafety-sbom/
 ├── uv.lock                     # UV lock file (auto-generated)
 ├── README.md
 ├── AGENTS.md                   # Agent instructions (UV-only)
-├── spdx_xsafety_sbom/          # Main package
-│   ├── __init__.py
-│   ├── cli.py                  # CLI entry point (click-based)
-│   ├── generator.py            # Main SBOM generation logic
-│   ├── strictdoc_parser.py     # StrictDoc JSON parsing
-│   ├── source_scanner.py       # @sdoc marker scanning
-│   ├── spdx_builder.py         # SPDX 3.0.1 element construction
-│   ├── relationships.py        # Relationship type mapping
-│   └── validation/
+├── src/
+│   └── spdx_xsafety_sbom/      # Main package
 │       ├── __init__.py
-│       ├── spdx_validator.py   # SPDX JSON-LD validation
-│       └── shacl_validator.py  # SHACL shape validation
+│       ├── cli.py              # CLI entry point (click-based)
+│       ├── generator.py        # Main SBOM generation logic
+│       ├── strictdoc_parser.py # StrictDoc parsing (native + JSON fallback)
+│       ├── source_scanner.py   # @sdoc marker scanning (native + regex)
+│       ├── spdx_builder.py     # SPDX 3.0.1 element construction
+│       ├── relationships.py    # Relationship type mapping
+│       └── validation/
+│           ├── __init__.py
+│           ├── spdx_validator.py   # SPDX JSON-LD validation
+│           └── shacl_validator.py  # SHACL shape validation
 ├── spdx_extensions/            # xSafety extension specs (from spdx_diff)
 │   ├── specs/
 │   │   └── safety-profile.md
