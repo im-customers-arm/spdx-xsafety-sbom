@@ -20,8 +20,9 @@ dependencies = ["click>=8.1.0", "rich>=13.0.0", "pydantic>=2.0.0"]
 
 [project.optional-dependencies]
 validation = ["pyshacl>=0.25.0", "rdflib>=7.0.0", "pyld>=2.0.0", "jsonschema>=4.0.0"]
+strictdoc = ["strictdoc>=0.1.0"]
 dev = ["pytest>=8.0.0", "pytest-cov>=5.0.0", "ruff>=0.4.0", "mypy>=1.10.0"]
-all = ["spdx-xsafety-sbom[validation,dev]"]
+all = ["spdx-xsafety-sbom[validation,strictdoc,dev]"]
 
 [project.scripts]
 spdx-xsafety-sbom = "spdx_xsafety_sbom.cli:main"

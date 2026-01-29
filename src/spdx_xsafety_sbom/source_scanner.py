@@ -17,23 +17,23 @@ from __future__ import annotations
 import logging
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterator
 
-from spdx_xsafety_sbom.constants import (
-    SCANNABLE_EXTENSIONS,
-    SDOC_MARKER_PATTERN,
-    SDOC_MULTILINE_PATTERN,
-)
+from spdx_xsafety_sbom.constants import SCANNABLE_EXTENSIONS
 from spdx_xsafety_sbom.models import RangeLink
-
-if TYPE_CHECKING:
-    pass
 
 logger = logging.getLogger(__name__)
 
+# Regex pattern for @sdoc[UID] markers
+SDOC_MARKER_PATTERN = re.compile(r"@sdoc\[([A-Z]+-\d+(?:\.\d+)*)\]")
+
 
 class SourceScanner:
-    """Scanner for @sdoc markers in source code files."""
+    """
+    Scanner for @sdoc markers in source code files.
+
+    Scans source files for @sdoc[UID] markers and extracts
+    line ranges and code snippets for SPDX traceability.
+    """
 
     def __init__(
         self,
@@ -61,10 +61,6 @@ class SourceScanner:
             "dist",
         ]
 
-        # Compile regex patterns
-        self._single_pattern = re.compile(SDOC_MARKER_PATTERN)
-        self._multi_pattern = re.compile(SDOC_MULTILINE_PATTERN)
-
     def scan(self) -> dict[str, list[RangeLink]]:
         """
         Scan source files for @sdoc markers.
@@ -73,14 +69,13 @@ class SourceScanner:
             Dictionary mapping UID to list of RangeLinks.
         """
         if not self.source_root.exists():
-            raise FileNotFoundError(
-                f"Source root not found: {self.source_root}"
-            )
+            raise FileNotFoundError(f"Source root not found: {self.source_root}")
 
         links: dict[str, list[RangeLink]] = {}
 
         for file_path in self._iter_source_files():
             file_links = self._scan_file(file_path)
+
             for link in file_links:
                 if link.uid not in links:
                     links[link.uid] = []
@@ -95,16 +90,13 @@ class SourceScanner:
 
         return links
 
-    def _iter_source_files(self) -> Iterator[Path]:
+    def _iter_source_files(self):
         """Iterate over scannable source files."""
         for ext in self.extensions:
             pattern = f"**/*{ext}"
             for file_path in self.source_root.glob(pattern):
                 # Skip excluded directories
-                if any(
-                    excluded in file_path.parts
-                    for excluded in self.excluded_dirs
-                ):
+                if any(excluded in file_path.parts for excluded in self.excluded_dirs):
                     continue
                 yield file_path
 
@@ -129,7 +121,7 @@ class SourceScanner:
 
         for line_num, line in enumerate(lines, start=1):
             # Find all @sdoc markers on this line
-            matches = self._single_pattern.findall(line)
+            matches = SDOC_MARKER_PATTERN.findall(line)
 
             for uid in matches:
                 # Determine the range (marker line + following code block)

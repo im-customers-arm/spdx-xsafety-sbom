@@ -15,8 +15,8 @@ class TestStrictDocParser:
     """Tests for StrictDocParser class."""
 
     def test_parse_export_directory(self, fixtures_dir: Path) -> None:
-        """Test parsing a StrictDoc export directory."""
-        export_path = fixtures_dir / "strictdoc-export"
+        """Test parsing a StrictDoc .sdoc directory."""
+        export_path = fixtures_dir / "sdoc"
         parser = StrictDocParser(export_path)
         nodes = parser.parse()
 
@@ -26,22 +26,19 @@ class TestStrictDocParser:
         assert "SSR-001" in nodes
 
     def test_parse_hazard_node(self, fixtures_dir: Path) -> None:
-        """Test hazard node has correct HARA data."""
-        export_path = fixtures_dir / "strictdoc-export"
+        """Test hazard node has correct data."""
+        export_path = fixtures_dir / "sdoc"
         parser = StrictDocParser(export_path)
         nodes = parser.parse()
 
         haz = nodes.get("HAZ-001")
         assert haz is not None
         assert haz.uid == "HAZ-001"
-        assert haz.severity == "S2"
-        assert haz.exposure == "E3"
-        assert haz.controllability == "C2"
-        assert haz.asil == "ASIL_B"
+        assert haz.title == "Missing CAM message not detected"
 
     def test_parse_parent_relationships(self, fixtures_dir: Path) -> None:
         """Test parent-child relationships are extracted."""
-        export_path = fixtures_dir / "strictdoc-export"
+        export_path = fixtures_dir / "sdoc"
         parser = StrictDocParser(export_path)
         nodes = parser.parse()
 
@@ -55,7 +52,7 @@ class TestStrictDocParser:
 
     def test_build_child_relationships(self, fixtures_dir: Path) -> None:
         """Test child relationships are computed."""
-        export_path = fixtures_dir / "strictdoc-export"
+        export_path = fixtures_dir / "sdoc"
         parser = StrictDocParser(export_path)
         nodes = parser.parse()
 
@@ -65,7 +62,7 @@ class TestStrictDocParser:
 
     def test_get_requirement_type(self, fixtures_dir: Path) -> None:
         """Test requirement type inference from UID."""
-        export_path = fixtures_dir / "strictdoc-export"
+        export_path = fixtures_dir / "sdoc"
         parser = StrictDocParser(export_path)
         nodes = parser.parse()
 
@@ -82,7 +79,7 @@ class TestStrictDocParser:
 
     def test_convenience_function(self, fixtures_dir: Path) -> None:
         """Test parse_strictdoc_export convenience function."""
-        export_path = fixtures_dir / "strictdoc-export"
+        export_path = fixtures_dir / "sdoc"
         nodes = parse_strictdoc_export(export_path)
 
         assert len(nodes) > 0

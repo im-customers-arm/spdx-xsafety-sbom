@@ -156,9 +156,7 @@ class GeneratorConfig(BaseModel):
     spdx_id_prefix: str = Field(
         "urn:spdx:example:", description="Prefix for SPDX element IDs"
     )
-    document_name: str = Field(
-        "design-sbom", description="Name of the SPDX document"
-    )
+    document_name: str = Field("design-sbom", description="Name of the SPDX document")
     document_namespace: str | None = Field(
         None, description="Namespace URI for the document"
     )
@@ -252,9 +250,7 @@ class XSafetyHazardExtension(BaseModel):
     severity: str | None = Field(None, alias="xSafety:severity")
     exposure: str | None = Field(None, alias="xSafety:exposure")
     controllability: str | None = Field(None, alias="xSafety:controllability")
-    safetyIntegrityLevel: str | None = Field(
-        None, alias="xSafety:safetyIntegrityLevel"
-    )
+    safetyIntegrityLevel: str | None = Field(None, alias="xSafety:safetyIntegrityLevel")
 
     class Config:
         populate_by_name = True
@@ -265,9 +261,7 @@ class XSafetyRequirementExtension(BaseModel):
 
     type: str = "xSafety:SafetyRequirementExtension"
     requirementType: str = Field(..., alias="xSafety:requirementType")
-    safetyIntegrityLevel: str | None = Field(
-        None, alias="xSafety:safetyIntegrityLevel"
-    )
+    safetyIntegrityLevel: str | None = Field(None, alias="xSafety:safetyIntegrityLevel")
 
     class Config:
         populate_by_name = True

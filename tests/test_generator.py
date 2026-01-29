@@ -18,8 +18,8 @@ class TestGenerateDesignSbom:
     def test_generate_from_strictdoc_export(
         self, fixtures_dir: Path, tmp_output: Path
     ) -> None:
-        """Test generating SBOM from StrictDoc export."""
-        export_path = fixtures_dir / "strictdoc-export"
+        """Test generating SBOM from StrictDoc .sdoc files."""
+        export_path = fixtures_dir / "sdoc"
 
         result = generate_design_sbom(
             strictdoc_export_path=export_path,
@@ -44,7 +44,7 @@ class TestGenerateDesignSbom:
         self, fixtures_dir: Path, tmp_output: Path
     ) -> None:
         """Test generating SBOM with source code scanning."""
-        export_path = fixtures_dir / "strictdoc-export"
+        export_path = fixtures_dir / "sdoc"
         source_path = fixtures_dir / "source"
 
         result = generate_design_sbom(
@@ -74,7 +74,7 @@ class TestGenerateDesignSbom:
         self, fixtures_dir: Path, tmp_path: Path
     ) -> None:
         """Test that output directory is created if missing."""
-        export_path = fixtures_dir / "strictdoc-export"
+        export_path = fixtures_dir / "sdoc"
         output_path = tmp_path / "subdir" / "nested" / "output.json"
 
         result = generate_design_sbom(
@@ -91,7 +91,7 @@ class TestGenerateDesignSbom:
         self, fixtures_dir: Path, tmp_output: Path
     ) -> None:
         """Test generating SBOM with custom SPDX ID prefix."""
-        export_path = fixtures_dir / "strictdoc-export"
+        export_path = fixtures_dir / "sdoc"
 
         result = generate_design_sbom(
             strictdoc_export_path=export_path,
@@ -138,7 +138,7 @@ class TestGenerateDesignSbom:
         self, fixtures_dir: Path, tmp_output: Path
     ) -> None:
         """Test that result includes generation time."""
-        export_path = fixtures_dir / "strictdoc-export"
+        export_path = fixtures_dir / "sdoc"
 
         result = generate_design_sbom(
             strictdoc_export_path=export_path,
@@ -147,5 +147,5 @@ class TestGenerateDesignSbom:
         )
 
         assert result.success
-        assert result.generation_time > 0
+        assert result.generation_time >= 0  # Can be 0.0 if generation is very fast
         assert result.timestamp is not None

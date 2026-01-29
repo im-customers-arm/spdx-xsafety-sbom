@@ -10,7 +10,10 @@ Commands:
 from __future__ import annotations
 
 import logging
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -103,7 +106,7 @@ def main(ctx: click.Context, verbose: bool) -> None:
 )
 @click.pass_context
 def generate(
-    ctx: click.Context,
+    _ctx: click.Context,
     strictdoc_export: Path,
     output: Path,
     source_root: Path | None,
@@ -116,12 +119,12 @@ def generate(
     """
     Generate an SPDX 3.0.1 Design SBOM from StrictDoc export.
 
-    STRICTDOC_EXPORT is the path to the StrictDoc JSON export directory
-    (typically build/strictdoc-json/).
+    STRICTDOC_EXPORT is the path to the StrictDoc directory
+    (containing .sdoc files).
 
     Example:
 
-        spdx-xsafety-sbom generate build/strictdoc-json -o design-sbom.json -s ./
+        spdx-xsafety-sbom generate ./docs/strictdoc -o design-sbom.json
 
     """
     console.print(
@@ -135,7 +138,7 @@ def generate(
     config_table = Table(title="Configuration", show_header=False)
     config_table.add_column("Setting", style="cyan")
     config_table.add_column("Value")
-    config_table.add_row("StrictDoc Export", str(strictdoc_export))
+    config_table.add_row("StrictDoc Source", str(strictdoc_export))
     config_table.add_row("Output", str(output))
     config_table.add_row("Source Root", str(source_root) if source_root else "None")
     config_table.add_row("SPDX ID Prefix", prefix)
@@ -184,7 +187,7 @@ def generate(
     else:
         console.print(
             Panel.fit(
-                f"[bold red]✗ SBOM generation failed![/]",
+                "[bold red]✗ SBOM generation failed![/]",
                 border_style="red",
                 title="Error",
             )
@@ -207,7 +210,7 @@ def generate(
     help="Run SHACL validation (requires pyshacl)",
 )
 @click.pass_context
-def validate(ctx: click.Context, sbom_file: Path, shacl: bool) -> None:
+def validate(_ctx: click.Context, sbom_file: Path, shacl: bool) -> None:
     """
     Validate an existing SPDX SBOM file.
 
@@ -224,7 +227,7 @@ def validate(ctx: click.Context, sbom_file: Path, shacl: bool) -> None:
     """
     console.print(
         Panel.fit(
-            f"[bold blue]SPDX Validator[/]",
+            "[bold blue]SPDX Validator[/]",
             border_style="blue",
         )
     )

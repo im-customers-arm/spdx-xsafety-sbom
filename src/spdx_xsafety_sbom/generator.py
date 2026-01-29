@@ -10,7 +10,6 @@ from __future__ import annotations
 import json
 import logging
 import time
-from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -21,7 +20,7 @@ from spdx_xsafety_sbom.spdx_builder import SPDX3Builder
 from spdx_xsafety_sbom.strictdoc_parser import StrictDocParser
 
 if TYPE_CHECKING:
-    from spdx_xsafety_sbom.models import RangeLink, StrictDocNode
+    from spdx_xsafety_sbom.models import RangeLink
 
 logger = logging.getLogger(__name__)
 
@@ -118,7 +117,7 @@ def generate_design_sbom(
 
         # Build elements for each node
         root_elements: list[str] = []
-        for uid, node in nodes.items():
+        for _uid, node in nodes.items():
             element = builder.build_node_element(node)
             # Top-level elements (no parents) are root elements
             if not node.parent_uids:
@@ -242,7 +241,8 @@ def _validate_document(document: dict[str, Any]) -> list[str]:
     orphans = element_ids - relationship_refs - root_elements
     # Filter out creator/tool elements
     orphans = {
-        oid for oid in orphans
+        oid
+        for oid in orphans
         if not any(x in oid for x in ["tool-", "org-", "document-"])
     }
 
