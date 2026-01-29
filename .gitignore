@@ -145,6 +145,11 @@ Thumbs.db
 
 # Project specific
 *.sbom.json
+*-sbom.json
 design-sbom.json
 output.json
 test-output.json
+test-results.txt
+
+# StrictDoc cache
+output/

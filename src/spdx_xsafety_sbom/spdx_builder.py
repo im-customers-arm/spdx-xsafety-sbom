@@ -160,11 +160,48 @@ class SPDX3Builder:
             "element": list(self._element_ids - {doc_id}),
         }
 
-        # Build complete JSON-LD document
+        # Build complete JSON-LD document with xSafety context
+        # The context defines property types and term mappings for SHACL validation
+        xsafety_context = {
+            "xSafety": XSAFETY_NS,
+            # Property type definitions (IRI types for SHACL)
+            "xSafety:severity": {"@id": "xSafety:severity", "@type": "@vocab"},
+            "xSafety:exposure": {"@id": "xSafety:exposure", "@type": "@vocab"},
+            "xSafety:controllability": {"@id": "xSafety:controllability", "@type": "@vocab"},
+            "xSafety:safetyIntegrityLevel": {"@id": "xSafety:safetyIntegrityLevel", "@type": "@vocab"},
+            "xSafety:requirementType": {"@id": "xSafety:requirementType", "@type": "@vocab"},
+            "xSafety:testType": {"@id": "xSafety:testType", "@type": "@vocab"},
+            "xSafety:evidenceType": {"@id": "xSafety:evidenceType", "@type": "@vocab"},
+            "xSafety:evidenceResult": {"@id": "xSafety:evidenceResult", "@type": "@vocab"},
+            "xSafety:complianceStatus": {"@id": "xSafety:complianceStatus", "@type": "@vocab"},
+            # Term mappings for vocabulary values
+            "s0": "xSafety:s0", "s1": "xSafety:s1", "s2": "xSafety:s2", "s3": "xSafety:s3",
+            "e0": "xSafety:e0", "e1": "xSafety:e1", "e2": "xSafety:e2", "e3": "xSafety:e3", "e4": "xSafety:e4",
+            "c0": "xSafety:c0", "c1": "xSafety:c1", "c2": "xSafety:c2", "c3": "xSafety:c3",
+            "asilA": "xSafety:asilA", "asilB": "xSafety:asilB", "asilC": "xSafety:asilC", "asilD": "xSafety:asilD", "qm": "xSafety:qm",
+            "sil1": "xSafety:sil1", "sil2": "xSafety:sil2", "sil3": "xSafety:sil3", "sil4": "xSafety:sil4",
+            "dalA": "xSafety:dalA", "dalB": "xSafety:dalB", "dalC": "xSafety:dalC", "dalD": "xSafety:dalD",
+            "technicalSafetyRequirement": "xSafety:technicalSafetyRequirement",
+            "softwareSafetyRequirement": "xSafety:softwareSafetyRequirement",
+            "hardwareSafetyRequirement": "xSafety:hardwareSafetyRequirement",
+            "functional": "xSafety:functional",
+            "unitTest": "xSafety:unitTest", "integrationTest": "xSafety:integrationTest",
+            "systemTest": "xSafety:systemTest", "validationTest": "xSafety:validationTest",
+            "regressionTest": "xSafety:regressionTest", "faultInjectionTest": "xSafety:faultInjectionTest",
+            "hardwareInLoopTest": "xSafety:hardwareInLoopTest", "softwareInLoopTest": "xSafety:softwareInLoopTest",
+            "modelInLoopTest": "xSafety:modelInLoopTest",
+            "testReport": "xSafety:testReport", "testResult": "xSafety:testResult",
+            "reviewReport": "xSafety:reviewReport", "analysisReport": "xSafety:analysisReport",
+            "certificationReport": "xSafety:certificationReport", "auditReport": "xSafety:auditReport",
+            "traceabilityMatrix": "xSafety:traceabilityMatrix", "complianceStatement": "xSafety:complianceStatement",
+            "pass": "xSafety:pass", "fail": "xSafety:fail", "partial": "xSafety:partial",
+            "inconclusive": "xSafety:inconclusive", "notApplicable": "xSafety:notApplicable",
+        }
+        
         document = {
             "@context": [
                 SPDX_CONTEXT,
-                {"xSafety": XSAFETY_NS},
+                xsafety_context,
             ],
             "@graph": [spdx_document] + self._elements,
         }

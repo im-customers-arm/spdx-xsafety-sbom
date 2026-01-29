@@ -21,7 +21,10 @@ from rich.panel import Panel
 from rich.table import Table
 
 from spdx_xsafety_sbom import __version__
-from spdx_xsafety_sbom.generator import generate_design_sbom
+from spdx_xsafety_sbom.generator import (
+    generate_design_sbom,
+    generate_design_sbom_from_project,
+)
 
 if TYPE_CHECKING:
     pass
@@ -101,9 +104,7 @@ def main(ctx: click.Context, verbose: bool) -> None:
     is_flag=True,
     help="Disable output validation",
 )
-@click.pass_context
 def generate(
-    ctx: click.Context,
     strictdoc_export: Path,
     output: Path,
     source_root: Path | None,
@@ -184,7 +185,130 @@ def generate(
     else:
         console.print(
             Panel.fit(
-                f"[bold red]✗ SBOM generation failed![/]",
+                "[bold red]✗ SBOM generation failed![/]",
+                border_style="red",
+                title="Error",
+            )
+        )
+
+        for error in result.errors:
+            console.print(f"  ✗ {error}", style="red")
+
+        sys.exit(1)
+
+
+@main.command("generate-native")
+@click.argument(
+    "project_path",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+)
+@click.option(
+    "-o",
+    "--output",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=Path("design-sbom.json"),
+    help="Output file path [default: design-sbom.json]",
+)
+@click.option(
+    "--prefix",
+    type=str,
+    default="urn:spdx:example:",
+    help="SPDX ID prefix [default: urn:spdx:example:]",
+)
+@click.option(
+    "--name",
+    type=str,
+    default="design-sbom",
+    help="Document name [default: design-sbom]",
+)
+@click.option(
+    "--org",
+    type=str,
+    help="Organization name for CreationInfo",
+)
+@click.option(
+    "--no-validate",
+    is_flag=True,
+    help="Disable output validation",
+)
+def generate_native(
+    project_path: Path,
+    output: Path,
+    prefix: str,
+    name: str,
+    org: str | None,
+    no_validate: bool,
+) -> None:
+    """
+    Generate an SPDX 3.0.1 Design SBOM directly from a StrictDoc project.
+
+    This command uses StrictDoc's native library API to parse .sdoc files
+    directly, eliminating the need for a separate JSON export step.
+
+    PROJECT_PATH is the root directory containing .sdoc files.
+
+    Example:
+
+        spdx-xsafety-sbom generate-native ./my-project -o design-sbom.json
+
+    """
+    console.print(
+        Panel.fit(
+            f"[bold blue]SPDX xSafety SBOM Generator v{__version__}[/]\n"
+            f"[dim](Native StrictDoc Mode)[/]",
+            border_style="blue",
+        )
+    )
+
+    # Show configuration
+    config_table = Table(title="Configuration", show_header=False)
+    config_table.add_column("Setting", style="cyan")
+    config_table.add_column("Value")
+    config_table.add_row("Project Path", str(project_path))
+    config_table.add_row("Output", str(output))
+    config_table.add_row("SPDX ID Prefix", prefix)
+    config_table.add_row("Document Name", name)
+    config_table.add_row("Organization", org or "None")
+    config_table.add_row("Validation", "Disabled" if no_validate else "Enabled")
+    console.print(config_table)
+    console.print()
+
+    # Generate SBOM
+    with console.status("[bold green]Generating SBOM..."):
+        result = generate_design_sbom_from_project(
+            project_path=project_path,
+            output_path=output,
+            spdx_id_prefix=prefix,
+            document_name=name,
+            organization=org,
+            validate_output=not no_validate,
+        )
+
+    # Display result
+    if result.success:
+        console.print(
+            Panel.fit(
+                f"[bold green]✓ SBOM generated successfully![/]\n\n"
+                f"Output: [cyan]{result.output_path}[/]\n"
+                f"Elements: [yellow]{result.element_count}[/]\n"
+                f"Relationships: [yellow]{result.relationship_count}[/]\n"
+                f"Time: [dim]{result.generation_time:.2f}s[/]",
+                border_style="green",
+                title="Success",
+            )
+        )
+
+        if result.warnings:
+            console.print()
+            console.print("[yellow]Warnings:[/]")
+            for warning in result.warnings:
+                console.print(f"  ⚠ {warning}")
+
+        sys.exit(0)
+    else:
+        console.print(
+            Panel.fit(
+                "[bold red]✗ SBOM generation failed![/]",
                 border_style="red",
                 title="Error",
             )
@@ -206,8 +330,7 @@ def generate(
     is_flag=True,
     help="Run SHACL validation (requires pyshacl)",
 )
-@click.pass_context
-def validate(ctx: click.Context, sbom_file: Path, shacl: bool) -> None:
+def validate(sbom_file: Path, shacl: bool) -> None:
     """
     Validate an existing SPDX SBOM file.
 
@@ -224,7 +347,7 @@ def validate(ctx: click.Context, sbom_file: Path, shacl: bool) -> None:
     """
     console.print(
         Panel.fit(
-            f"[bold blue]SPDX Validator[/]",
+            "[bold blue]SPDX Validator[/]",
             border_style="blue",
         )
     )

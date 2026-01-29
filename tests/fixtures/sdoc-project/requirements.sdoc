@@ -1,0 +1,78 @@
+[DOCUMENT]
+TITLE: Sample Safety Requirements
+
+[GRAMMAR]
+ELEMENTS:
+- TAG: REQUIREMENT
+  FIELDS:
+  - TITLE: UID
+    TYPE: String
+    REQUIRED: True
+  - TITLE: TITLE
+    TYPE: String
+    REQUIRED: False
+  - TITLE: STATEMENT
+    TYPE: String
+    REQUIRED: False
+  - TITLE: ASIL
+    TYPE: String
+    REQUIRED: False
+  - TITLE: SEVERITY
+    TYPE: String
+    REQUIRED: False
+  - TITLE: EXPOSURE
+    TYPE: String
+    REQUIRED: False
+  - TITLE: CONTROLLABILITY
+    TYPE: String
+    REQUIRED: False
+  - TITLE: RATIONALE
+    TYPE: String
+    REQUIRED: False
+  RELATIONS:
+  - TYPE: Parent
+
+[REQUIREMENT]
+UID: HAZ-001
+TITLE: Missing CAM message not detected
+STATEMENT: Missing CAM message not detected within timeout period
+ASIL: ASIL_B
+SEVERITY: S2
+EXPOSURE: E3
+CONTROLLABILITY: C2
+
+[REQUIREMENT]
+UID: SG-001
+TITLE: CAM message timeout detection
+STATEMENT: Ensure CAM message reception is monitored with timeout detection
+ASIL: ASIL_B
+RELATIONS:
+- TYPE: Parent
+  VALUE: HAZ-001
+
+[REQUIREMENT]
+UID: SSR-001
+TITLE: Timer scheduling
+STATEMENT: cam-service shall schedule a per-event timer that triggers a safety violation if the next event is not received within 1000ms
+ASIL: ASIL_B
+RELATIONS:
+- TYPE: Parent
+  VALUE: SG-001
+
+[REQUIREMENT]
+UID: SSR-002
+TITLE: Timer cancellation
+STATEMENT: cam-service shall cancel the timer when a valid event is received
+ASIL: ASIL_B
+RELATIONS:
+- TYPE: Parent
+  VALUE: SG-001
+
+[REQUIREMENT]
+UID: TC-001
+TITLE: Test timer trigger
+STATEMENT: Verify timer triggers on missing CAM message
+ASIL: ASIL_B
+RELATIONS:
+- TYPE: Parent
+  VALUE: SSR-001
