@@ -7,17 +7,15 @@ This module provides parsing of StrictDoc artifacts to extract:
 - Traceability links (parent/child relationships)
 - Document structure
 
-Supports two modes:
-1. Native mode: Uses StrictDoc library directly for .sdoc files
-2. JSON mode: Parses StrictDoc's JSON export format (fallback)
+Uses StrictDoc library directly for native .sdoc file parsing.
+Requires StrictDoc to be installed.
 """
 
 from __future__ import annotations
 
-import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any
 
 from spdx_xsafety_sbom.models import StrictDocNode
 
@@ -26,14 +24,16 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-# Check if StrictDoc library is available
-_STRICTDOC_AVAILABLE = False
+# StrictDoc library is required
 try:
     from strictdoc.backend.sdoc.reader import SDReader
 
     _STRICTDOC_AVAILABLE = True
-except ImportError:
-    SDReader = None  # type: ignore[misc, assignment]
+except ImportError as e:
+    raise ImportError(
+        "StrictDoc library is required for native parsing. "
+        "Install with: uv add strictdoc"
+    ) from e
 
 
 def is_strictdoc_available() -> bool:
@@ -41,48 +41,38 @@ def is_strictdoc_available() -> bool:
     return _STRICTDOC_AVAILABLE
 
 
-def _walk_nodes(nodes: list[dict[str, Any]] | None) -> Iterator[dict[str, Any]]:
-    """Recursively walk through StrictDoc node tree (handles nested NODES)."""
-    for node in nodes or []:
-        yield node
-        yield from _walk_nodes(node.get("NODES"))
-
-
 class StrictDocParser:
     """
-    Parser for StrictDoc artifacts.
+    Parser for StrictDoc .sdoc files using native StrictDoc library.
 
-    Supports both native .sdoc file parsing (when StrictDoc is installed)
-    and JSON export parsing (fallback mode).
+    Parses .sdoc files directly using StrictDoc's SDReader for
+    requirements extraction and traceability analysis.
     """
 
     def __init__(
         self,
         path: Path,
-        *,
-        prefer_native: bool = True,
     ) -> None:
         """
         Initialize the StrictDoc parser.
 
         Args:
             path: Path to StrictDoc content. Can be:
-                - A directory containing .sdoc files (native mode)
-                - A directory containing JSON export files
+                - A directory containing .sdoc files
                 - A single .sdoc file
-                - A single .json file
-            prefer_native: If True, prefer native parsing when available.
         """
         self.path = Path(path)
         # Legacy alias for backward compatibility
         self.export_path = self.path
-        self.prefer_native = prefer_native and _STRICTDOC_AVAILABLE
         self._nodes: dict[str, StrictDocNode] = {}
         self._documents: list[Any] = []
 
     def parse(self) -> dict[str, StrictDocNode]:
         """
-        Parse StrictDoc artifacts.
+        Parse StrictDoc .sdoc files.
+
+        Uses native SDReader for simple projects, but falls back to
+        running `strictdoc export` for projects with custom grammars.
 
         Returns:
             Dictionary mapping UID to StrictDocNode objects.
@@ -90,64 +80,39 @@ class StrictDocParser:
         if not self.path.exists():
             raise FileNotFoundError(f"StrictDoc path not found: {self.path}")
 
-        # Determine parsing mode based on path and available libraries
         if self.path.is_file():
-            if self.path.suffix == ".sdoc" and self.prefer_native:
+            if self.path.suffix == ".sdoc":
                 self._parse_native_file(self.path)
-            elif self.path.suffix == ".json":
-                self._parse_json_file(self.path)
             else:
-                raise ValueError(f"Unsupported file type: {self.path.suffix}")
-        else:
-            # Directory: check for custom grammar or config
-            sdoc_files = list(self.path.glob("**/*.sdoc"))
-            json_files = list(self.path.glob("**/*.json"))
-            has_custom_grammar = (
-                (self.path / "strictdoc.toml").exists()
-                or list(self.path.glob("*.sgra"))
-            )
-
-            if sdoc_files and self.prefer_native:
-                if has_custom_grammar:
-                    # Use full StrictDoc export pipeline for custom grammars
-                    logger.info(
-                        "Detected custom grammar, using StrictDoc export for %d .sdoc files",
-                        len(sdoc_files),
-                    )
-                    if self._parse_native_directory(self.path):
-                        # Success - JSON parsing happened in _parse_native_directory
-                        pass
-                    elif json_files:
-                        # Fallback to existing JSON files
-                        logger.info(
-                            "Falling back to JSON export parsing for %d .json files",
-                            len(json_files),
-                        )
-                        for json_file in json_files:
-                            self._parse_json_file(json_file)
-                    else:
-                        logger.warning(
-                            "StrictDoc export failed and no JSON files found"
-                        )
-                        return {}
-                else:
-                    # Simple native parsing (default grammar)
-                    logger.info(
-                        "Using native StrictDoc parsing for %d .sdoc files",
-                        len(sdoc_files),
-                    )
-                    for sdoc_file in sdoc_files:
-                        self._parse_native_file(sdoc_file)
-            elif json_files:
-                logger.info(
-                    "Using JSON export parsing for %d .json files",
-                    len(json_files),
+                raise ValueError(
+                    f"Unsupported file type: {self.path.suffix}. "
+                    "Only .sdoc files are supported."
                 )
-                for json_file in json_files:
-                    self._parse_json_file(json_file)
-            else:
-                logger.warning("No .sdoc or .json files found in %s", self.path)
+        else:
+            # Directory: check for custom grammars
+            sgra_files = list(self.path.glob("**/*.sgra"))
+            sdoc_files = list(self.path.glob("**/*.sdoc"))
+
+            if not sdoc_files:
+                logger.warning("No .sdoc files found in %s", self.path)
                 return {}
+
+            if sgra_files:
+                # Custom grammars detected - use export-based parsing
+                logger.info(
+                    "Custom grammar files detected (%d .sgra files). "
+                    "Using strictdoc export for parsing.",
+                    len(sgra_files),
+                )
+                self._parse_via_export()
+            else:
+                # Standard grammars - use native parsing
+                logger.info(
+                    "Using native StrictDoc parsing for %d .sdoc files",
+                    len(sdoc_files),
+                )
+                for sdoc_file in sdoc_files:
+                    self._parse_native_file(sdoc_file)
 
         # Build child relationships (reverse of parent links)
         self._build_child_relationships()
@@ -156,101 +121,260 @@ class StrictDocParser:
         return self._nodes
 
     # =========================================================================
-    # Native StrictDoc Parsing (using StrictDoc library)
+    # Export-based Parsing (for projects with custom grammars)
     # =========================================================================
 
-    def _parse_native_directory(self, sdoc_dir: Path) -> bool:
+    def _parse_via_export(self) -> None:
         """
-        Parse a directory of .sdoc files using StrictDoc's export command.
-        
-        This handles custom grammars by using StrictDoc's full export pipeline.
-        
-        Returns:
-            True if successful, False if should fallback to JSON parsing.
+        Parse StrictDoc project by running `strictdoc export --formats json`.
+
+        This is required for projects with custom grammars (.sgra files)
+        because the SDReader doesn't handle IMPORT_FROM_FILE directives.
         """
-        if not _STRICTDOC_AVAILABLE:
-            return False
-        
+        import json
         import subprocess
         import tempfile
-        
-        # Check if there's a config file (strictdoc.toml) or grammar file (.sgra)
-        config_file = sdoc_dir / "strictdoc.toml"
-        grammar_files = list(sdoc_dir.glob("*.sgra"))
-        
-        # If no custom grammar, try simple parsing
-        if not config_file.exists() and not grammar_files:
-            return False  # Fall through to simple native parsing
-        
-        logger.info(
-            "Detected custom grammar or config, using StrictDoc export pipeline"
-        )
-        
-        # Create a temporary directory for the JSON export
+
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_output = Path(temp_dir)
-            
-            # Build the export command
+            temp_output = Path(temp_dir) / "export"
+
+            # Run strictdoc export from the source directory
+            # This ensures grammar files are resolved relative to the .sdoc files
+            #
+            # Find strictdoc executable - prefer system Python over venv
+            # because some venv versions (0.16.x) have issues with grammar imports
+            import os
+            import shutil
+
+            # Try to find system Python's strictdoc first
+            system_python_scripts = None
+            for possible_path in [
+                # Windows common paths
+                Path(os.path.expanduser("~")) / "AppData" / "Local" / "Programs" / "Python" / "Python312" / "Scripts" / "strictdoc.exe",
+                Path(os.path.expanduser("~")) / "AppData" / "Local" / "Programs" / "Python" / "Python311" / "Scripts" / "strictdoc.exe",
+                Path(os.path.expanduser("~")) / "AppData" / "Local" / "Programs" / "Python" / "Python310" / "Scripts" / "strictdoc.exe",
+                # Linux/Mac
+                Path("/usr/local/bin/strictdoc"),
+                Path("/usr/bin/strictdoc"),
+            ]:
+                if possible_path.exists():
+                    system_python_scripts = str(possible_path)
+                    break
+
+            strictdoc_cmd = system_python_scripts or shutil.which("strictdoc")
+            if not strictdoc_cmd:
+                raise RuntimeError(
+                    "StrictDoc CLI not found. Install with: pip install strictdoc"
+                )
+
+            logger.debug("Using StrictDoc at: %s", strictdoc_cmd)
+
             cmd = [
-                "strictdoc",
+                strictdoc_cmd,
                 "export",
-                str(sdoc_dir),
-                "--output-dir", str(temp_output),
-                "--formats", "json",
+                ".",  # Export current directory
+                "--output-dir",
+                str(temp_output),
+                "--formats",
+                "json",
             ]
-            
-            # Add config if present
-            if config_file.exists():
-                cmd.extend(["--config", str(config_file)])
-            
+
             try:
-                logger.debug("Running: %s", " ".join(cmd))
+                # Create a clean environment without our venv
+                # This allows using the system StrictDoc which may have
+                # different/compatible behavior with custom grammars
+                import os
+
+                clean_env = os.environ.copy()
+                # Remove virtual environment paths to use system Python/StrictDoc
+                clean_env.pop("VIRTUAL_ENV", None)
+                if "PATH" in clean_env:
+                    # Filter out venv paths from PATH
+                    venv_path = os.environ.get("VIRTUAL_ENV", "")
+                    if venv_path:
+                        paths = clean_env["PATH"].split(os.pathsep)
+                        paths = [p for p in paths if not p.startswith(venv_path)]
+                        clean_env["PATH"] = os.pathsep.join(paths)
+
                 result = subprocess.run(
                     cmd,
                     capture_output=True,
                     text=True,
-                    timeout=120,  # 2 minute timeout
+                    timeout=120,
+                    check=False,
+                    cwd=str(self.path),  # Run from the StrictDoc directory
+                    env=clean_env,
                 )
-                
+
                 if result.returncode != 0:
-                    logger.warning(
-                        "StrictDoc export failed: %s", 
-                        result.stderr or result.stdout
+                    logger.error("StrictDoc export failed: %s", result.stderr)
+                    logger.error("stdout: %s", result.stdout)
+                    raise RuntimeError(
+                        f"StrictDoc export failed with code {result.returncode}: "
+                        f"{result.stderr or result.stdout}"
                     )
-                    return False
-                
-                # Find and parse the generated index.json
-                json_dir = temp_output / "json"
-                if json_dir.exists():
-                    json_files = list(json_dir.glob("*.json"))
-                    for json_file in json_files:
-                        self._parse_json_file(json_file)
-                    return True
-                else:
-                    logger.warning("No JSON output found in %s", temp_output)
-                    return False
-                    
-            except subprocess.TimeoutExpired:
-                logger.warning("StrictDoc export timed out")
-                return False
-            except FileNotFoundError:
-                logger.warning("StrictDoc CLI not found in PATH")
-                return False
-            except Exception as e:
-                logger.warning("StrictDoc export error: %s", e)
-                return False
+
+            except subprocess.TimeoutExpired as err:
+                logger.error("StrictDoc export timed out")
+                raise RuntimeError("StrictDoc export timed out after 120 seconds") from err
+            except FileNotFoundError as err:
+                logger.error("StrictDoc CLI not found")
+                raise RuntimeError(
+                    "StrictDoc CLI not found. Install with: uv add strictdoc"
+                ) from err
+
+            # Find and parse the JSON output
+            json_file = temp_output / "json" / "index.json"
+            if not json_file.exists():
+                raise RuntimeError(f"JSON export not found at {json_file}")
+
+            with open(json_file, encoding="utf-8") as f:
+                data = json.load(f)
+
+            # Parse the JSON structure
+            self._parse_json_export(data)
+
+    def _parse_json_export(self, data: dict) -> None:
+        """
+        Parse the JSON export from StrictDoc.
+
+        Args:
+            data: Parsed JSON data from index.json export.
+        """
+        documents = data.get("DOCUMENTS", [])
+        for doc in documents:
+            doc_title = doc.get("TITLE", "Unknown")
+            self._parse_json_document(doc, doc_title)
+
+    def _parse_json_document(self, doc: dict, doc_title: str) -> None:
+        """Parse a single document from JSON export."""
+        # Parse NODES (flat list of all nodes)
+        nodes = doc.get("NODES", [])
+        self._walk_json_nodes(nodes, doc_title)
+
+    def _walk_json_nodes(self, nodes: list, doc_title: str) -> None:
+        """Recursively walk through JSON nodes."""
+        for node in nodes:
+            node_type = node.get("NODE_TYPE", "")
+
+            # Skip structural nodes
+            if node_type in ("SECTION", "DOCUMENT"):
+                # Recurse into children
+                children = node.get("NODES", [])
+                if children:
+                    self._walk_json_nodes(children, doc_title)
+                continue
+
+            # Parse requirement-type nodes
+            uid = node.get("UID")
+            if uid:
+                self._parse_json_node(node)
+
+            # Recurse into children
+            children = node.get("NODES", [])
+            if children:
+                self._walk_json_nodes(children, doc_title)
+
+    def _parse_json_node(self, node: dict) -> None:
+        """Parse a single node from JSON export."""
+        uid = node.get("UID")
+        if not uid or uid in self._nodes:
+            return
+
+        node_type = node.get("NODE_TYPE", "REQUIREMENT")
+        title = node.get("TITLE")
+        statement = node.get("STATEMENT")
+        rationale = node.get("RATIONALE")
+        comment = node.get("COMMENT")
+
+        # Safety metadata
+        asil = node.get("ASIL")
+        severity = node.get("SEVERITY")
+        exposure = node.get("EXPOSURE")
+        controllability = node.get("CONTROLLABILITY")
+
+        # Extract parent UIDs from RELATIONS
+        parent_uids = self._extract_json_parent_uids(node)
+
+        # Create the node
+        sdoc_node = StrictDocNode(
+            uid=uid,
+            title=title,
+            statement=statement,
+            rationale=rationale,
+            comment=comment,
+            node_type=node_type,
+            asil=asil,
+            severity=severity,
+            exposure=exposure,
+            controllability=controllability,
+            parent_uids=parent_uids,
+            document_path=None,  # Not available from JSON
+        )
+
+        self._nodes[uid] = sdoc_node
+        logger.debug(
+            "Parsed JSON node: %s (type=%s, parents=%s)",
+            uid,
+            sdoc_node.get_requirement_type(),
+            parent_uids,
+        )
+
+    def _extract_json_parent_uids(self, node: dict) -> list[str]:
+        """Extract parent UIDs from JSON node relations."""
+        parent_uids: list[str] = []
+        relations = node.get("RELATIONS", [])
+
+        for relation in relations:
+            rel_type = relation.get("TYPE", "")
+            if rel_type in ("Parent", "Refines", "Derives"):
+                ref_uid = relation.get("VALUE")
+                if ref_uid:
+                    parent_uids.append(ref_uid)
+
+        return parent_uids
+
+    # =========================================================================
+    # Native StrictDoc Parsing (using StrictDoc library)
+    # =========================================================================
+
+    def _inline_grammar_imports(self, content: str, base_path: Path) -> str:
+        """
+        Inline IMPORT_FROM_FILE grammar references.
+
+        StrictDoc's SDReader doesn't resolve IMPORT_FROM_FILE directives,
+        so we need to inline the grammar content before parsing.
+
+        Args:
+            content: The .sdoc file content.
+            base_path: Base path for resolving relative grammar file paths.
+
+        Returns:
+            Content with grammar file inlined.
+        """
+        import re
+
+        pattern = r"\[GRAMMAR\]\nIMPORT_FROM_FILE:\s*(\S+)"
+        match = re.search(pattern, content)
+        if match:
+            grammar_filename = match.group(1)
+            grammar_path = base_path / grammar_filename
+            if grammar_path.exists():
+                with open(grammar_path, encoding="utf-8") as f:
+                    grammar_text = f.read()
+                # Replace the import directive with the actual grammar content
+                content = re.sub(pattern, grammar_text, content)
+                logger.debug("Inlined grammar from %s", grammar_path)
+        return content
 
     def _parse_native_file(self, sdoc_file: Path) -> None:
         """Parse a single .sdoc file using the StrictDoc library."""
-        if not _STRICTDOC_AVAILABLE:
-            raise RuntimeError(
-                "StrictDoc library not available. "
-                "Install with: uv add strictdoc"
-            )
-
         try:
             with open(sdoc_file, encoding="utf-8") as f:
                 content = f.read()
+
+            # Inline any grammar imports
+            content = self._inline_grammar_imports(content, sdoc_file.parent)
 
             reader = SDReader()
             document = reader.read(content, file_path=str(sdoc_file))
@@ -312,7 +436,9 @@ class StrictDocParser:
 
         # Extract fields
         title = node.reserved_title
-        statement = node.reserved_statement if hasattr(node, "reserved_statement") else None
+        statement = (
+            node.reserved_statement if hasattr(node, "reserved_statement") else None
+        )
         rationale = node.rationale if hasattr(node, "rationale") else None
         comment = self._get_native_field_value(node, "COMMENT")
 
@@ -380,184 +506,12 @@ class StrictDocParser:
             # Check if it's a parent reference
             if hasattr(relation, "ref_type"):
                 ref_type = relation.ref_type
-                if ref_type in ("Parent", "Refines", "Derives"):
-                    if hasattr(relation, "ref_uid") and relation.ref_uid:
-                        parent_uids.append(relation.ref_uid)
-
-        return parent_uids
-
-    # =========================================================================
-    # JSON Export Parsing (fallback mode)
-    # =========================================================================
-
-    def _parse_json_file(self, json_file: Path) -> None:
-        """Parse a single JSON export file."""
-        try:
-            with open(json_file, encoding="utf-8") as f:
-                data = json.load(f)
-        except json.JSONDecodeError as e:
-            logger.error("Failed to parse %s: %s", json_file, e)
-            return
-
-        # Handle DOCUMENTS array format (StrictDoc standard export)
-        if isinstance(data, dict) and "DOCUMENTS" in data:
-            for doc in data["DOCUMENTS"]:
-                self._parse_json_document_nodes(doc, json_file)
-        elif isinstance(data, dict):
-            if "document" in data:
-                self._parse_json_document_nodes(data["document"], json_file)
-            elif "NODES" in data:
-                self._parse_json_all_nodes(data["NODES"], json_file)
-            elif "nodes" in data:
-                self._parse_json_all_nodes(data["nodes"], json_file)
-        elif isinstance(data, list):
-            for item in data:
-                if isinstance(item, dict) and "NODES" in item:
-                    self._parse_json_all_nodes(item["NODES"], json_file)
-
-    def _parse_json_document_nodes(
-        self,
-        doc: dict[str, Any],
-        source_file: Path,
-    ) -> None:
-        """Parse all nodes from a JSON document using recursive walk."""
-        self._documents.append(doc)
-        # Support both NODES (StrictDoc standard) and sections (alternative format)
-        nodes = doc.get("NODES") or doc.get("nodes") or doc.get("sections", [])
-        self._parse_json_all_nodes(nodes, source_file)
-
-    def _parse_json_all_nodes(
-        self,
-        nodes: list[dict[str, Any]],
-        source_file: Path,
-    ) -> None:
-        """Parse all nodes recursively using _walk_nodes."""
-        for node in _walk_nodes(nodes):
-            self._parse_json_node(node, source_file)
-
-    def _parse_json_node(self, node: dict[str, Any], source_file: Path) -> None:
-        """Parse a single requirement/section node from JSON."""
-        # Get UID (uppercase preferred for StrictDoc format)
-        uid = node.get("UID") or node.get("uid")
-        if not uid:
-            return
-
-        # Skip if already parsed (avoid duplicates)
-        if uid in self._nodes:
-            logger.debug("Skipping duplicate node: %s", uid)
-            return
-
-        # Get node type
-        node_type = (
-            node.get("TYPE")
-            or node.get("type")
-            or node.get("node_type")
-            or node.get("_NODE_TYPE")
-            or "REQUIREMENT"
-        )
-
-        # Skip TEXT and SECTION nodes without meaningful UIDs
-        if node_type in ("TEXT", "SECTION") and not any(
-            uid.startswith(prefix)
-            for prefix in ("HAZ", "SG", "TSR", "SSR", "HSR", "TC", "EVID", "REQ")
-        ):
-            return
-
-        # Extract basic fields
-        title = node.get("TITLE") or node.get("title")
-
-        # Statement can be in various locations
-        statement = (
-            node.get("STATEMENT")
-            or node.get("statement")
-            or node.get("TEXT")
-            or node.get("text")
-        )
-
-        # Handle statement as dict (StrictDoc nested format)
-        if isinstance(statement, dict):
-            statement = statement.get("text") or statement.get("content")
-
-        rationale = node.get("RATIONALE") or node.get("rationale")
-        if isinstance(rationale, dict):
-            rationale = rationale.get("text") or rationale.get("content")
-
-        comment = node.get("COMMENT") or node.get("comment")
-        if isinstance(comment, dict):
-            comment = comment.get("text") or comment.get("content")
-
-        # Extract safety-specific fields (directly on node or in custom_fields)
-        custom_fields = node.get("custom_fields", {})
-        asil = node.get("ASIL") or node.get("asil") or custom_fields.get("ASIL")
-        severity = (
-            node.get("SEVERITY") or node.get("severity") or custom_fields.get("SEVERITY")
-        )
-        exposure = (
-            node.get("EXPOSURE") or node.get("exposure") or custom_fields.get("EXPOSURE")
-        )
-        controllability = (
-            node.get("CONTROLLABILITY")
-            or node.get("controllability")
-            or custom_fields.get("CONTROLLABILITY")
-        )
-
-        # Extract parent links from RELATIONS
-        parent_uids = self._extract_json_parent_uids(node)
-
-        # Create node
-        sdoc_node = StrictDocNode(
-            uid=uid,
-            title=title,
-            statement=statement,
-            rationale=rationale,
-            comment=comment,
-            node_type=node_type,
-            asil=asil,
-            severity=severity,
-            exposure=exposure,
-            controllability=controllability,
-            parent_uids=parent_uids,
-            document_path=source_file,
-        )
-
-        self._nodes[uid] = sdoc_node
-        logger.debug(
-            "Parsed node: %s (type=%s, parents=%s)",
-            uid,
-            sdoc_node.get_requirement_type(),
-            parent_uids,
-        )
-
-    def _extract_json_parent_uids(self, node: dict[str, Any]) -> list[str]:
-        """Extract parent UIDs from JSON RELATIONS field."""
-        parent_uids: list[str] = []
-
-        relations = node.get("RELATIONS") or node.get("relations") or []
-
-        for relation in relations:
-            if isinstance(relation, dict):
-                # Get relation type
-                rel_type = (
-                    relation.get("TYPE")
-                    or relation.get("type")
-                    or relation.get("role")
-                    or ""
-                )
-
-                # Get target UID - StrictDoc uses VALUE, not UID
-                rel_uid = (
-                    relation.get("VALUE")  # StrictDoc standard format
-                    or relation.get("UID")
-                    or relation.get("uid")
-                    or relation.get("target")
-                )
-
-                # Only include Parent relations (not File relations)
-                if rel_uid and rel_type.lower() in ("parent", "refines", "derives"):
-                    parent_uids.append(rel_uid)
-            elif isinstance(relation, str):
-                # Handle string format (assume it's a parent UID)
-                parent_uids.append(relation)
+                if (
+                    ref_type in ("Parent", "Refines", "Derives")
+                    and hasattr(relation, "ref_uid")
+                    and relation.ref_uid
+                ):
+                    parent_uids.append(relation.ref_uid)
 
         return parent_uids
 
@@ -582,11 +536,7 @@ class StrictDocParser:
         Returns:
             List of matching nodes.
         """
-        return [
-            node
-            for node in self._nodes.values()
-            if node.uid.startswith(prefix)
-        ]
+        return [node for node in self._nodes.values() if node.uid.startswith(prefix)]
 
     def get_hazards(self) -> list[StrictDocNode]:
         """Get all hazard nodes (HAZ-*)."""
@@ -615,13 +565,13 @@ class StrictDocParser:
 
 def parse_strictdoc_export(path: Path | str) -> dict[str, StrictDocNode]:
     """
-    Convenience function to parse StrictDoc artifacts.
+    Convenience function to parse StrictDoc .sdoc files.
 
-    Supports both native .sdoc files (when StrictDoc is installed)
-    and JSON export format.
+    Uses StrictDoc library for native parsing.
+    Requires StrictDoc to be installed.
 
     Args:
-        path: Path to StrictDoc content (directory or file).
+        path: Path to StrictDoc content (directory or .sdoc file).
 
     Returns:
         Dictionary mapping UID to StrictDocNode.

@@ -11,7 +11,7 @@ This module constructs SPDX 3.0.1 JSON-LD elements with xSafety extensions:
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -101,7 +101,9 @@ class SPDX3Builder:
             creators.append(
                 {
                     "type": "Organization",
-                    "spdxId": self.make_spdx_id("org", organization.lower().replace(" ", "-")),
+                    "spdxId": self.make_spdx_id(
+                        "org", organization.lower().replace(" ", "-")
+                    ),
                     "name": organization,
                 }
             )
@@ -109,7 +111,7 @@ class SPDX3Builder:
         self._creation_info = {
             "type": "CreationInfo",
             "specVersion": SPDX_VERSION,
-            "created": datetime.now(timezone.utc).isoformat(),
+            "created": datetime.now(UTC).isoformat(),
             "createdBy": [c["spdxId"] for c in creators],
             "createdUsing": [creators[0]["spdxId"]],
         }
@@ -122,7 +124,7 @@ class SPDX3Builder:
 
     def build_document(
         self,
-        namespace: str | None = None,
+        _namespace: str | None = None,
         root_elements: list[str] | None = None,
     ) -> dict[str, Any]:
         """

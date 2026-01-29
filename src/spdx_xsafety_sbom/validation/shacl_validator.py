@@ -19,7 +19,12 @@ from spdx_xsafety_sbom.validation.spdx_validator import ValidationResult
 logger = logging.getLogger(__name__)
 
 # Path to SHACL shapes file (relative to package)
-SHAPES_PATH = Path(__file__).parent.parent.parent.parent / "spdx_extensions" / "shacl" / "safety-shapes.ttl"
+SHAPES_PATH = (
+    Path(__file__).parent.parent.parent.parent
+    / "spdx_extensions"
+    / "shacl"
+    / "safety-shapes.ttl"
+)
 
 
 def validate_shacl(
@@ -49,10 +54,7 @@ def validate_shacl(
         return result
 
     # Determine shapes path
-    if shapes_path:
-        shapes_file = Path(shapes_path)
-    else:
-        shapes_file = SHAPES_PATH
+    shapes_file = Path(shapes_path) if shapes_path else SHAPES_PATH
 
     if not shapes_file.exists():
         result.warnings.append(f"SHACL shapes file not found: {shapes_file}")
@@ -105,10 +107,6 @@ def _parse_shacl_results(results_graph: Any, result: ValidationResult) -> None:
         results_graph: RDFLib graph with SHACL results.
         result: ValidationResult to update.
     """
-    from rdflib import SH, Namespace
-
-    SH_NS = Namespace("http://www.w3.org/ns/shacl#")
-
     # Query for validation results
     query = """
     PREFIX sh: <http://www.w3.org/ns/shacl#>

@@ -256,9 +256,7 @@ def _validate_element(elem: dict[str, Any], result: ValidationResult) -> None:
 
     # Must have @type or type
     if "@type" not in elem and "type" not in elem:
-        result.errors.append(
-            f"Element missing @type: {elem.get('spdxId', 'unknown')}"
-        )
+        result.errors.append(f"Element missing @type: {elem.get('spdxId', 'unknown')}")
 
     # Validate extensions if present
     extensions = elem.get("extension", [])
@@ -317,8 +315,5 @@ def _validate_extension(
                 f"SafetyEvidenceExtension on {parent_id} missing evidenceType"
             )
 
-    elif ext_type == "xSafety:SafetyTestExtension":
-        if "xSafety:testType" not in ext:
-            result.errors.append(
-                f"SafetyTestExtension on {parent_id} missing testType"
-            )
+    elif ext_type == "xSafety:SafetyTestExtension" and "xSafety:testType" not in ext:
+        result.errors.append(f"SafetyTestExtension on {parent_id} missing testType")

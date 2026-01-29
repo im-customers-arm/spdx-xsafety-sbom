@@ -281,14 +281,8 @@ PURPOSE_VALUES: Final[dict[str, str]] = {
 }
 
 # =============================================================================
-# Source Code Marker Patterns
+# Source Code Extensions (for native StrictDoc scanning)
 # =============================================================================
-
-# Regex patterns for @sdoc markers in source code
-SDOC_MARKER_PATTERN: Final[str] = r"@sdoc\[(?P<uid>[A-Z]+-\d+(?:\.\d+)*)\]"
-SDOC_MULTILINE_PATTERN: Final[str] = (
-    r"@sdoc\[(?P<uid>[A-Z]+-\d+(?:\.\d+)*(?:,\s*[A-Z]+-\d+(?:\.\d+)*)*)\]"
-)
 
 # File extensions to scan for @sdoc markers
 SCANNABLE_EXTENSIONS: Final[tuple[str, ...]] = (

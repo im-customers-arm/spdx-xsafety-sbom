@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any
 
-from spdx_xsafety_sbom.constants import LINK_ROLE_MAPPING, RELATIONSHIP_TYPES
+from spdx_xsafety_sbom.constants import RELATIONSHIP_TYPES
 from spdx_xsafety_sbom.models import RangeLink, StrictDocNode
 
 if TYPE_CHECKING:
@@ -107,9 +107,7 @@ class RelationshipBuilder:
 
             for parent_uid in node.parent_uids:
                 if parent_uid not in nodes:
-                    logger.warning(
-                        "Parent UID %s not found for %s", parent_uid, uid
-                    )
+                    logger.warning("Parent UID %s not found for %s", parent_uid, uid)
                     continue
 
                 parent_spdx_id = self.spdx_builder.make_spdx_id("element", parent_uid)

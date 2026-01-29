@@ -19,8 +19,8 @@ def fixtures_dir() -> Path:
 
 @pytest.fixture
 def sample_strictdoc_export(fixtures_dir: Path) -> Path:
-    """Path to sample StrictDoc export directory."""
-    return fixtures_dir / "strictdoc-export"
+    """Path to sample StrictDoc .sdoc directory."""
+    return fixtures_dir / "sdoc"
 
 
 @pytest.fixture

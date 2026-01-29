@@ -8,13 +8,13 @@
   "@graph": [
     {
       "@type": "SpdxDocument",
-      "spdxId": "urn:spdx:example:document-design-sbom",
-      "name": "design-sbom",
+      "spdxId": "urn:spdx:example:document-CAM-Design-SBOM",
+      "name": "CAM Design SBOM",
       "specVersion": "3.0.1",
       "creationInfo": {
         "type": "CreationInfo",
         "specVersion": "3.0.1",
-        "created": "2026-01-26T15:17:40.624547+00:00",
+        "created": "2026-01-29T16:09:47.200681+00:00",
         "createdBy": [
           "urn:spdx:example:tool-spdx-xsafety-sbom"
         ],
@@ -36,288 +36,216 @@
         "urn:spdx:example:element-HAZ-005"
       ],
       "element": [
-        "urn:spdx:example:file-test-test_config_deploy.py#L36-L37",
-        "urn:spdx:example:element-SSR-005",
-        "urn:spdx:example:relationship-rel-168",
-        "urn:spdx:example:evidence-EVID-006",
-        "urn:spdx:example:relationship-rel-9",
-        "urn:spdx:example:relationship-rel-45",
-        "urn:spdx:example:relationship-rel-137",
-        "urn:spdx:example:relationship-rel-88",
-        "urn:spdx:example:relationship-rel-167",
-        "urn:spdx:example:evidence-EVID-008",
-        "urn:spdx:example:element-SWA-012",
-        "urn:spdx:example:element-SWA-004",
-        "urn:spdx:example:evidence-EVID-012",
-        "urn:spdx:example:relationship-rel-115",
-        "urn:spdx:example:element-SG-001",
-        "urn:spdx:example:relationship-rel-34",
-        "urn:spdx:example:relationship-rel-108",
-        "urn:spdx:example:relationship-rel-22",
-        "urn:spdx:example:file-test-test_config_deploy.py#L45-L46",
-        "urn:spdx:example:relationship-rel-101",
-        "urn:spdx:example:relationship-rel-55",
-        "urn:spdx:example:relationship-rel-87",
-        "urn:spdx:example:relationship-rel-150",
-        "urn:spdx:example:relationship-rel-133",
-        "urn:spdx:example:relationship-rel-139",
-        "urn:spdx:example:relationship-rel-26",
-        "urn:spdx:example:relationship-rel-36",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L386-L399",
-        "urn:spdx:example:relationship-rel-8",
-        "urn:spdx:example:relationship-rel-81",
-        "urn:spdx:example:file-test-test_calibration.py#L18-L22",
-        "urn:spdx:example:relationship-rel-110",
-        "urn:spdx:example:relationship-rel-106",
-        "urn:spdx:example:evidence-EVID-005",
-        "urn:spdx:example:relationship-rel-71",
-        "urn:spdx:example:relationship-rel-155",
-        "urn:spdx:example:file-cam-tool-test-test_cam_message.py#L36-L43",
-        "urn:spdx:example:relationship-rel-44",
-        "urn:spdx:example:relationship-rel-172",
-        "urn:spdx:example:relationship-rel-27",
-        "urn:spdx:example:element-TC-007",
-        "urn:spdx:example:relationship-rel-14",
-        "urn:spdx:example:relationship-rel-1",
-        "urn:spdx:example:relationship-rel-144",
-        "urn:spdx:example:relationship-rel-46",
-        "urn:spdx:example:relationship-rel-66",
-        "urn:spdx:example:relationship-rel-159",
-        "urn:spdx:example:relationship-rel-127",
-        "urn:spdx:example:element-SWA-003",
-        "urn:spdx:example:relationship-rel-91",
-        "urn:spdx:example:relationship-rel-59",
-        "urn:spdx:example:relationship-rel-29",
-        "urn:spdx:example:relationship-rel-105",
-        "urn:spdx:example:evidence-EVID-004",
-        "urn:spdx:example:relationship-rel-61",
-        "urn:spdx:example:element-SG-002",
-        "urn:spdx:example:relationship-rel-120",
-        "urn:spdx:example:relationship-rel-52",
-        "urn:spdx:example:relationship-rel-104",
-        "urn:spdx:example:element-HAZ-005",
-        "urn:spdx:example:relationship-rel-122",
-        "urn:spdx:example:tool-spdx-xsafety-sbom",
-        "urn:spdx:example:relationship-rel-151",
-        "urn:spdx:example:relationship-rel-39",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L51-L58",
-        "urn:spdx:example:relationship-rel-107",
-        "urn:spdx:example:relationship-rel-124",
-        "urn:spdx:example:file-test-test_static_config.py#L133-L136",
-        "urn:spdx:example:relationship-rel-164",
-        "urn:spdx:example:relationship-rel-23",
-        "urn:spdx:example:file-test-test_calibration.py#L25-L29",
-        "urn:spdx:example:file-libcam-test-src-test_libcam.c#L311-L317",
-        "urn:spdx:example:relationship-rel-85",
-        "urn:spdx:example:element-SSR-023",
-        "urn:spdx:example:file-test-test_config_deploy.py#L23-L26",
-        "urn:spdx:example:relationship-rel-69",
-        "urn:spdx:example:relationship-rel-37",
-        "urn:spdx:example:relationship-rel-152",
-        "urn:spdx:example:element-TSR-006",
-        "urn:spdx:example:element-TC-006",
-        "urn:spdx:example:relationship-rel-90",
-        "urn:spdx:example:file-test-test_static_config.py#L163-L165",
-        "urn:spdx:example:relationship-rel-35",
-        "urn:spdx:example:relationship-rel-83",
-        "urn:spdx:example:relationship-rel-7",
-        "urn:spdx:example:relationship-rel-40",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L361-L368",
-        "urn:spdx:example:file-cam-service-src-cam_socket.c#L136-L186",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L93-L102",
-        "urn:spdx:example:evidence-EVID-002",
-        "urn:spdx:example:relationship-rel-54",
-        "urn:spdx:example:relationship-rel-33",
-        "urn:spdx:example:relationship-rel-118",
-        "urn:spdx:example:relationship-rel-92",
-        "urn:spdx:example:relationship-rel-58",
-        "urn:spdx:example:element-SG-004",
-        "urn:spdx:example:relationship-rel-135",
-        "urn:spdx:example:relationship-rel-13",
-        "urn:spdx:example:relationship-rel-169",
-        "urn:spdx:example:element-SSR-001",
-        "urn:spdx:example:relationship-rel-93",
-        "urn:spdx:example:element-HAZ-002",
-        "urn:spdx:example:relationship-rel-147",
-        "urn:spdx:example:relationship-rel-171",
-        "urn:spdx:example:relationship-rel-173",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L258-L260",
-        "urn:spdx:example:relationship-rel-51",
-        "urn:spdx:example:relationship-rel-154",
-        "urn:spdx:example:relationship-rel-64",
-        "urn:spdx:example:relationship-rel-119",
-        "urn:spdx:example:file-scripts-generate_spdx_design_sbom.py#L104-L107",
-        "urn:spdx:example:relationship-rel-2",
-        "urn:spdx:example:relationship-rel-131",
-        "urn:spdx:example:relationship-rel-123",
-        "urn:spdx:example:file-libcam-test-src-test_libcam.c#L447-L450",
-        "urn:spdx:example:relationship-rel-158",
-        "urn:spdx:example:relationship-rel-6",
-        "urn:spdx:example:relationship-rel-31",
-        "urn:spdx:example:relationship-rel-116",
-        "urn:spdx:example:relationship-rel-98",
-        "urn:spdx:example:relationship-rel-126",
-        "urn:spdx:example:element-SWA-008",
-        "urn:spdx:example:element-SG-003",
-        "urn:spdx:example:relationship-rel-134",
-        "urn:spdx:example:element-HAZ-003",
-        "urn:spdx:example:file-test-test_static_config.py#L105-L110",
-        "urn:spdx:example:file-cam-service-src-cam_socket.c#L432-L478",
-        "urn:spdx:example:element-SSR-002",
-        "urn:spdx:example:relationship-rel-75",
-        "urn:spdx:example:element-SSR-022",
-        "urn:spdx:example:element-SSR-030",
-        "urn:spdx:example:file-libcam-test-src-test_libcam.c#L350-L354",
-        "urn:spdx:example:relationship-rel-114",
-        "urn:spdx:example:element-TSR-003",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L1071-L1088",
-        "urn:spdx:example:relationship-rel-129",
-        "urn:spdx:example:element-TC-008",
-        "urn:spdx:example:element-TC-009",
-        "urn:spdx:example:relationship-rel-156",
-        "urn:spdx:example:relationship-rel-42",
-        "urn:spdx:example:relationship-rel-160",
-        "urn:spdx:example:relationship-rel-63",
-        "urn:spdx:example:relationship-rel-143",
-        "urn:spdx:example:relationship-rel-41",
-        "urn:spdx:example:relationship-rel-145",
-        "urn:spdx:example:element-SSR-010",
-        "urn:spdx:example:relationship-rel-121",
-        "urn:spdx:example:element-TSR-002",
-        "urn:spdx:example:relationship-rel-113",
-        "urn:spdx:example:element-TC-002",
-        "urn:spdx:example:relationship-rel-47",
-        "urn:spdx:example:element-SWA-006",
-        "urn:spdx:example:element-SSR-021",
-        "urn:spdx:example:relationship-rel-117",
-        "urn:spdx:example:element-TC-011",
-        "urn:spdx:example:evidence-EVID-010",
-        "urn:spdx:example:relationship-rel-80",
-        "urn:spdx:example:relationship-rel-18",
-        "urn:spdx:example:element-TSR-004",
-        "urn:spdx:example:element-SSR-020",
-        "urn:spdx:example:relationship-rel-21",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L151-L160",
-        "urn:spdx:example:relationship-rel-67",
-        "urn:spdx:example:relationship-rel-141",
-        "urn:spdx:example:relationship-rel-96",
-        "urn:spdx:example:relationship-rel-32",
-        "urn:spdx:example:file-test-test_calibration.py#L55-L59",
-        "urn:spdx:example:evidence-EVID-009",
-        "urn:spdx:example:relationship-rel-12",
-        "urn:spdx:example:relationship-rel-5",
-        "urn:spdx:example:relationship-rel-84",
-        "urn:spdx:example:relationship-rel-62",
-        "urn:spdx:example:relationship-rel-76",
-        "urn:spdx:example:element-TSR-008",
-        "urn:spdx:example:element-TC-010",
-        "urn:spdx:example:evidence-EVID-003",
-        "urn:spdx:example:relationship-rel-82",
-        "urn:spdx:example:file-cam-tool-test-test_cam_csel.py#L42-L47",
-        "urn:spdx:example:element-SSR-008",
-        "urn:spdx:example:file-test-test_static_config.py#L147-L150",
-        "urn:spdx:example:element-SWA-005",
-        "urn:spdx:example:relationship-rel-148",
-        "urn:spdx:example:relationship-rel-60",
-        "urn:spdx:example:relationship-rel-136",
-        "urn:spdx:example:relationship-rel-25",
-        "urn:spdx:example:relationship-rel-79",
-        "urn:spdx:example:element-SWA-009",
-        "urn:spdx:example:relationship-rel-140",
-        "urn:spdx:example:relationship-rel-11",
-        "urn:spdx:example:relationship-rel-4",
-        "urn:spdx:example:relationship-rel-78",
-        "urn:spdx:example:relationship-rel-77",
-        "urn:spdx:example:element-SSR-003",
-        "urn:spdx:example:element-TC-005",
-        "urn:spdx:example:relationship-rel-16",
-        "urn:spdx:example:element-SSR-006",
-        "urn:spdx:example:relationship-rel-20",
-        "urn:spdx:example:relationship-rel-103",
-        "urn:spdx:example:element-HAZ-001",
-        "urn:spdx:example:relationship-rel-95",
-        "urn:spdx:example:element-SWA-001",
-        "urn:spdx:example:relationship-rel-89",
-        "urn:spdx:example:element-SG-005",
-        "urn:spdx:example:relationship-rel-30",
-        "urn:spdx:example:relationship-rel-130",
-        "urn:spdx:example:relationship-rel-70",
-        "urn:spdx:example:relationship-rel-162",
-        "urn:spdx:example:relationship-rel-17",
-        "urn:spdx:example:relationship-rel-68",
-        "urn:spdx:example:relationship-rel-28",
-        "urn:spdx:example:relationship-rel-111",
-        "urn:spdx:example:relationship-rel-157",
-        "urn:spdx:example:relationship-rel-19",
-        "urn:spdx:example:relationship-rel-161",
-        "urn:spdx:example:file-cam-service-src-cam_socket.c#L301-L311",
-        "urn:spdx:example:relationship-rel-65",
-        "urn:spdx:example:relationship-rel-132",
-        "urn:spdx:example:relationship-rel-138",
-        "urn:spdx:example:element-SWA-002",
-        "urn:spdx:example:relationship-rel-3",
-        "urn:spdx:example:relationship-rel-43",
-        "urn:spdx:example:evidence-EVID-007",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L440-L452",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L73-L78",
-        "urn:spdx:example:relationship-rel-149",
-        "urn:spdx:example:relationship-rel-100",
-        "urn:spdx:example:relationship-rel-50",
-        "urn:spdx:example:relationship-rel-146",
-        "urn:spdx:example:relationship-rel-48",
-        "urn:spdx:example:relationship-rel-109",
-        "urn:spdx:example:relationship-rel-142",
-        "urn:spdx:example:file-cam-tool-test-test_cam_csel.py#L59-L60",
-        "urn:spdx:example:element-SSR-009",
-        "urn:spdx:example:element-TC-001",
-        "urn:spdx:example:file-test-test_calibration.py#L41-L45",
-        "urn:spdx:example:element-SWA-010",
-        "urn:spdx:example:relationship-rel-166",
-        "urn:spdx:example:evidence-EVID-011",
-        "urn:spdx:example:element-SSR-011",
-        "urn:spdx:example:element-SWA-007",
-        "urn:spdx:example:relationship-rel-153",
-        "urn:spdx:example:relationship-rel-38",
-        "urn:spdx:example:relationship-rel-112",
-        "urn:spdx:example:relationship-rel-74",
-        "urn:spdx:example:element-TSR-007",
-        "urn:spdx:example:file-cam-tool-test-test_cam_csc.py#L60-L62",
-        "urn:spdx:example:element-HAZ-004",
-        "urn:spdx:example:element-TSR-001",
-        "urn:spdx:example:relationship-rel-163",
-        "urn:spdx:example:element-TC-004",
-        "urn:spdx:example:file-scripts-generate_spdx3_design_sbom.py#L225-L226",
-        "urn:spdx:example:element-SSR-032",
-        "urn:spdx:example:relationship-rel-86",
         "urn:spdx:example:relationship-rel-57",
-        "urn:spdx:example:element-SSR-033",
-        "urn:spdx:example:relationship-rel-128",
-        "urn:spdx:example:relationship-rel-24",
-        "urn:spdx:example:relationship-rel-49",
-        "urn:spdx:example:relationship-rel-99",
-        "urn:spdx:example:relationship-rel-56",
-        "urn:spdx:example:relationship-rel-72",
+        "urn:spdx:example:relationship-rel-14",
+        "urn:spdx:example:relationship-rel-16",
+        "urn:spdx:example:relationship-rel-29",
+        "urn:spdx:example:relationship-rel-39",
+        "urn:spdx:example:relationship-rel-129",
+        "urn:spdx:example:relationship-rel-78",
+        "urn:spdx:example:relationship-rel-112",
+        "urn:spdx:example:element-TSR-003",
         "urn:spdx:example:relationship-rel-15",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L120-L129",
-        "urn:spdx:example:relationship-rel-170",
-        "urn:spdx:example:relationship-rel-94",
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L347-L353",
-        "urn:spdx:example:relationship-rel-53",
+        "urn:spdx:example:relationship-rel-130",
+        "urn:spdx:example:evidence-EVID-012",
+        "urn:spdx:example:element-TSR-008",
+        "urn:spdx:example:element-SWA-008",
+        "urn:spdx:example:relationship-rel-19",
+        "urn:spdx:example:relationship-rel-117",
+        "urn:spdx:example:relationship-rel-76",
+        "urn:spdx:example:relationship-rel-33",
+        "urn:spdx:example:relationship-rel-38",
+        "urn:spdx:example:relationship-rel-47",
+        "urn:spdx:example:element-SWA-004",
+        "urn:spdx:example:relationship-rel-80",
+        "urn:spdx:example:element-HAZ-002",
+        "urn:spdx:example:relationship-rel-42",
+        "urn:spdx:example:relationship-rel-89",
+        "urn:spdx:example:element-SSR-021",
+        "urn:spdx:example:relationship-rel-2",
+        "urn:spdx:example:relationship-rel-93",
         "urn:spdx:example:relationship-rel-125",
-        "urn:spdx:example:element-SSR-007",
-        "urn:spdx:example:relationship-rel-10",
-        "urn:spdx:example:relationship-rel-97",
+        "urn:spdx:example:evidence-EVID-002",
+        "urn:spdx:example:element-TC-009",
+        "urn:spdx:example:relationship-rel-72",
+        "urn:spdx:example:relationship-rel-106",
+        "urn:spdx:example:relationship-rel-44",
+        "urn:spdx:example:relationship-rel-95",
+        "urn:spdx:example:relationship-rel-126",
+        "urn:spdx:example:relationship-rel-128",
+        "urn:spdx:example:relationship-rel-68",
+        "urn:spdx:example:element-TC-011",
+        "urn:spdx:example:relationship-rel-40",
+        "urn:spdx:example:element-HAZ-003",
+        "urn:spdx:example:relationship-rel-54",
+        "urn:spdx:example:element-SSR-030",
+        "urn:spdx:example:relationship-rel-67",
+        "urn:spdx:example:relationship-rel-111",
+        "urn:spdx:example:element-TC-010",
         "urn:spdx:example:element-TC-003",
-        "urn:spdx:example:relationship-rel-165",
-        "urn:spdx:example:element-SSR-004",
-        "urn:spdx:example:file-cam-tool-test-test_cam_csc.py#L82-L83",
+        "urn:spdx:example:relationship-rel-102",
+        "urn:spdx:example:element-SWA-009",
+        "urn:spdx:example:element-HAZ-004",
+        "urn:spdx:example:relationship-rel-60",
+        "urn:spdx:example:relationship-rel-65",
         "urn:spdx:example:element-SSR-031",
-        "urn:spdx:example:relationship-rel-73",
-        "urn:spdx:example:evidence-EVID-001",
+        "urn:spdx:example:element-SSR-002",
+        "urn:spdx:example:relationship-rel-25",
+        "urn:spdx:example:relationship-rel-10",
+        "urn:spdx:example:relationship-rel-23",
+        "urn:spdx:example:relationship-rel-81",
+        "urn:spdx:example:element-SWA-006",
+        "urn:spdx:example:element-TC-002",
+        "urn:spdx:example:relationship-rel-74",
+        "urn:spdx:example:element-SWA-002",
+        "urn:spdx:example:element-SSR-011",
+        "urn:spdx:example:relationship-rel-104",
+        "urn:spdx:example:element-SSR-010",
+        "urn:spdx:example:relationship-rel-123",
+        "urn:spdx:example:evidence-EVID-005",
+        "urn:spdx:example:relationship-rel-12",
+        "urn:spdx:example:element-SSR-022",
+        "urn:spdx:example:evidence-EVID-010",
+        "urn:spdx:example:relationship-rel-41",
         "urn:spdx:example:element-SWA-011",
-        "urn:spdx:example:file-libcam-test-src-test_libcam.c#L281-L285",
+        "urn:spdx:example:relationship-rel-135",
+        "urn:spdx:example:relationship-rel-35",
+        "urn:spdx:example:relationship-rel-119",
+        "urn:spdx:example:element-SWA-001",
+        "urn:spdx:example:element-SSR-008",
+        "urn:spdx:example:element-TSR-002",
+        "urn:spdx:example:element-TSR-004",
+        "urn:spdx:example:element-TSR-001",
+        "urn:spdx:example:relationship-rel-133",
+        "urn:spdx:example:relationship-rel-121",
+        "urn:spdx:example:relationship-rel-49",
+        "urn:spdx:example:element-SG-001",
+        "urn:spdx:example:element-SG-002",
+        "urn:spdx:example:evidence-EVID-011",
+        "urn:spdx:example:evidence-EVID-006",
+        "urn:spdx:example:relationship-rel-22",
+        "urn:spdx:example:relationship-rel-46",
+        "urn:spdx:example:relationship-rel-26",
+        "urn:spdx:example:relationship-rel-113",
+        "urn:spdx:example:relationship-rel-96",
+        "urn:spdx:example:element-SWA-007",
+        "urn:spdx:example:relationship-rel-97",
+        "urn:spdx:example:relationship-rel-132",
+        "urn:spdx:example:relationship-rel-86",
+        "urn:spdx:example:element-SG-005",
+        "urn:spdx:example:relationship-rel-21",
+        "urn:spdx:example:relationship-rel-62",
+        "urn:spdx:example:element-SSR-009",
+        "urn:spdx:example:relationship-rel-13",
+        "urn:spdx:example:relationship-rel-70",
+        "urn:spdx:example:relationship-rel-32",
+        "urn:spdx:example:relationship-rel-88",
+        "urn:spdx:example:relationship-rel-56",
+        "urn:spdx:example:relationship-rel-107",
+        "urn:spdx:example:relationship-rel-63",
+        "urn:spdx:example:relationship-rel-136",
+        "urn:spdx:example:element-SWA-003",
+        "urn:spdx:example:relationship-rel-105",
+        "urn:spdx:example:relationship-rel-103",
+        "urn:spdx:example:element-SG-003",
+        "urn:spdx:example:relationship-rel-108",
+        "urn:spdx:example:relationship-rel-134",
+        "urn:spdx:example:relationship-rel-6",
+        "urn:spdx:example:relationship-rel-52",
+        "urn:spdx:example:element-TC-006",
+        "urn:spdx:example:relationship-rel-71",
+        "urn:spdx:example:element-TSR-006",
+        "urn:spdx:example:relationship-rel-53",
+        "urn:spdx:example:relationship-rel-7",
+        "urn:spdx:example:evidence-EVID-001",
+        "urn:spdx:example:relationship-rel-30",
         "urn:spdx:example:element-TSR-005",
-        "urn:spdx:example:relationship-rel-102"
+        "urn:spdx:example:relationship-rel-17",
+        "urn:spdx:example:relationship-rel-87",
+        "urn:spdx:example:relationship-rel-84",
+        "urn:spdx:example:evidence-EVID-009",
+        "urn:spdx:example:relationship-rel-45",
+        "urn:spdx:example:relationship-rel-116",
+        "urn:spdx:example:relationship-rel-61",
+        "urn:spdx:example:relationship-rel-137",
+        "urn:spdx:example:relationship-rel-27",
+        "urn:spdx:example:relationship-rel-99",
+        "urn:spdx:example:relationship-rel-91",
+        "urn:spdx:example:element-SG-004",
+        "urn:spdx:example:relationship-rel-85",
+        "urn:spdx:example:element-SSR-007",
+        "urn:spdx:example:relationship-rel-115",
+        "urn:spdx:example:element-SSR-006",
+        "urn:spdx:example:relationship-rel-83",
+        "urn:spdx:example:element-SWA-005",
+        "urn:spdx:example:relationship-rel-127",
+        "urn:spdx:example:relationship-rel-92",
+        "urn:spdx:example:relationship-rel-28",
+        "urn:spdx:example:relationship-rel-18",
+        "urn:spdx:example:element-TC-005",
+        "urn:spdx:example:relationship-rel-3",
+        "urn:spdx:example:relationship-rel-8",
+        "urn:spdx:example:relationship-rel-90",
+        "urn:spdx:example:relationship-rel-94",
+        "urn:spdx:example:relationship-rel-11",
+        "urn:spdx:example:relationship-rel-34",
+        "urn:spdx:example:relationship-rel-118",
+        "urn:spdx:example:relationship-rel-43",
+        "urn:spdx:example:relationship-rel-101",
+        "urn:spdx:example:relationship-rel-120",
+        "urn:spdx:example:relationship-rel-100",
+        "urn:spdx:example:relationship-rel-124",
+        "urn:spdx:example:evidence-EVID-003",
+        "urn:spdx:example:relationship-rel-73",
+        "urn:spdx:example:relationship-rel-66",
+        "urn:spdx:example:element-SSR-001",
+        "urn:spdx:example:evidence-EVID-008",
+        "urn:spdx:example:relationship-rel-50",
+        "urn:spdx:example:relationship-rel-109",
+        "urn:spdx:example:relationship-rel-37",
+        "urn:spdx:example:element-SSR-020",
+        "urn:spdx:example:relationship-rel-82",
+        "urn:spdx:example:relationship-rel-9",
+        "urn:spdx:example:relationship-rel-122",
+        "urn:spdx:example:relationship-rel-114",
+        "urn:spdx:example:element-SSR-003",
+        "urn:spdx:example:relationship-rel-36",
+        "urn:spdx:example:relationship-rel-5",
+        "urn:spdx:example:relationship-rel-59",
+        "urn:spdx:example:relationship-rel-79",
+        "urn:spdx:example:element-SSR-032",
+        "urn:spdx:example:tool-spdx-xsafety-sbom",
+        "urn:spdx:example:element-SSR-005",
+        "urn:spdx:example:element-HAZ-005",
+        "urn:spdx:example:relationship-rel-48",
+        "urn:spdx:example:element-SWA-012",
+        "urn:spdx:example:relationship-rel-110",
+        "urn:spdx:example:element-SSR-023",
+        "urn:spdx:example:element-TC-001",
+        "urn:spdx:example:evidence-EVID-007",
+        "urn:spdx:example:element-HAZ-001",
+        "urn:spdx:example:relationship-rel-75",
+        "urn:spdx:example:relationship-rel-4",
+        "urn:spdx:example:element-TC-004",
+        "urn:spdx:example:element-TC-008",
+        "urn:spdx:example:relationship-rel-1",
+        "urn:spdx:example:relationship-rel-20",
+        "urn:spdx:example:relationship-rel-131",
+        "urn:spdx:example:element-TSR-007",
+        "urn:spdx:example:element-TC-007",
+        "urn:spdx:example:element-SSR-033",
+        "urn:spdx:example:relationship-rel-51",
+        "urn:spdx:example:relationship-rel-58",
+        "urn:spdx:example:relationship-rel-98",
+        "urn:spdx:example:relationship-rel-31",
+        "urn:spdx:example:relationship-rel-77",
+        "urn:spdx:example:relationship-rel-55",
+        "urn:spdx:example:relationship-rel-69",
+        "urn:spdx:example:evidence-EVID-004",
+        "urn:spdx:example:relationship-rel-24",
+        "urn:spdx:example:element-SSR-004",
+        "urn:spdx:example:element-SWA-010",
+        "urn:spdx:example:relationship-rel-64"
       ]
     },
     {
@@ -1312,762 +1240,6 @@
           "xSafety:evidenceType": "testResult"
         }
       ]
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-src-cam_socket.c#L136-L186",
-      "name": "cam_socket.c",
-      "description": "Source: cam-service\\src\\cam_socket.c lines 136-186",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 136
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 186
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[SWA-001]\nstatic int thread_pool_init(void)\n{\n\tpthread_attr_t attr;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-src-cam_socket.c#L301-L311",
-      "name": "cam_socket.c",
-      "description": "Source: cam-service\\src\\cam_socket.c lines 301-311",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 301
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 311
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[SWA-001]\nstatic void *dispatch_thread(void *arg)\n{\n\tstruct cam_socket_ctx *ctx = arg;\n\tint peer_fd;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-src-cam_socket.c#L432-L478",
-      "name": "cam_socket.c",
-      "description": "Source: cam-service\\src\\cam_socket.c lines 432-478",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 432
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 478
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[SWA-001]\nint cam_socket_init(struct cam_socket_ctx *ctx, struct cam_socket_cfg *cfg)\n{\n\tpthread_attr_t attr;\n\tint res;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L51-L58",
-      "name": "test_cam_fault.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_fault.c lines 51-58",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 51
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 58
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-003]\n\tunsigned int report_cnt = fault_report_count;\n\tchar *stream_name = \"CAM STREAM 0001\";\n\tchar *uuid_str = \"84085ddc-bc10-11ed-9a44-7ef9696e0001\";\n\tcam_uuid_t stream_uuid;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L73-L78",
-      "name": "test_cam_fault.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_fault.c lines 73-78",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 73
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 78
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-004]\n\tunsigned int report_cnt = fault_report_count;\n\tchar *stream_name = \"CAM STREAM 0001\";\n\tchar *uuid_str = \"84085ddc-bc10-11ed-9a44-7ef9696e0001\";\n\tcam_uuid_t stream_uuid;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_static_config.py#L133-L136",
-      "name": "test_static_config.py",
-      "description": "Source: test\\test_static_config.py lines 133-136",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 133
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 136
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-004]\n        # Check with start to event timeout\n        self.start_tcpdump(tcpdump)\n        service.spawn(params=f\"-c {csd_file_dir}\")"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L93-L102",
-      "name": "test_cam_fault.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_fault.c lines 93-102",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 93
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 102
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-005]\n\tunsigned int report_cnt = fault_report_count;\n\tstruct timespec tp;\n\tchar *stream_name = \"CAM STREAM 0001\";\n\tchar *uuid_str = \"84085ddc-bc10-11ed-9a44-7ef9696e0001\";"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L120-L129",
-      "name": "test_cam_fault.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_fault.c lines 120-129",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 120
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 129
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-002]\n\tunsigned int report_cnt = fault_report_count;\n\tstruct timespec tp;\n\tchar *stream_name = \"CAM STREAM 0001\";\n\tchar *uuid_str = \"84085ddc-bc10-11ed-9a44-7ef9696e0001\";"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L1071-L1088",
-      "name": "test_cam_stream.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_stream.c lines 1071-1088",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 1071
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 1088
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-002]\n\tint ret;\n\tint i;\n\tuint64_t timestamp;\n\tstruct stream_ctx ctx;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_static_config.py#L163-L165",
-      "name": "test_static_config.py",
-      "description": "Source: test\\test_static_config.py lines 163-165",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 163
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 165
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-002]\n        self.start_tcpdump(tcpdump)\n        service.spawn(params=f\"-c {csd_file_dir}\")"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L151-L160",
-      "name": "test_cam_fault.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_fault.c lines 151-160",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 151
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 160
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-001]\n\tunsigned int report_cnt = fault_report_count;\n\tstruct timespec tp;\n\tchar *stream_name = \"CAM STREAM 0001\";\n\tchar *uuid_str = \"84085ddc-bc10-11ed-9a44-7ef9696e0001\";"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_static_config.py#L147-L150",
-      "name": "test_static_config.py",
-      "description": "Source: test\\test_static_config.py lines 147-150",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 147
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 150
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-001]\n        # Check with event temporal error\n        self.start_tcpdump(tcpdump)\n        service.spawn(params=f\"-c {csd_file_dir}\")"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L258-L260",
-      "name": "test_cam_stream.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_stream.c lines 258-260",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 258
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 260
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-006]\n\tint i;\n\tint ret;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_static_config.py#L105-L110",
-      "name": "test_static_config.py",
-      "description": "Source: test\\test_static_config.py lines 105-110",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 105
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 110
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-006]\n        self.start_tcpdump(tcpdump)\n        # This means the applications should not run for more than 2 minutes\n        failsafe_countdown = 24\n        uuid_base = '99085ddc-bc10-11ed"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-tool-test-test_cam_csc.py#L60-L62",
-      "name": "test_cam_csc.py",
-      "description": "Source: cam-tool\\test\\test_cam_csc.py lines 60-62",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 60
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 62
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-006]\n    # Empty file\n    invalid_csc_file('empty_file.csc.yml')"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-tool-test-test_cam_csc.py#L82-L83",
-      "name": "test_cam_csc.py",
-      "description": "Source: cam-tool\\test\\test_cam_csc.py lines 82-83",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 82
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 83
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-006]\n    data = cam_csc.CamStreamConfig(get_path('valid.csc.yml')).data"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L347-L353",
-      "name": "test_cam_stream.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_stream.c lines 347-353",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 347
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 353
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-011]\n\tstruct cam_msg_header header = {\n\t\t.version_major = 0xFF,\n\t\t.version_minor = CAM_MSG_VERSION_MINOR,\n\t\t.size = htons(sizeof(struct cam_msg_header)),"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L361-L368",
-      "name": "test_cam_stream.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_stream.c lines 361-368",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 361
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 368
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-011]\n\tint ret;\n\tstruct cam_msg_header header = {\n\t\t.version_major = CAM_MSG_VERSION_MAJOR,\n\t\t.version_minor = CAM_MSG_VERSION_MINOR,"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L386-L399",
-      "name": "test_cam_stream.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_stream.c lines 386-399",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 386
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 399
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-008]\n\tint ret;\n\tuint64_t timestamp;\n\tstruct stream_ctx ctx[CONFIG_CAM_SERVICE_MAX_STREAM_PER_CONN];\n\tstruct cam_msg_a2s_start msg = {"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L440-L452",
-      "name": "test_cam_stream.c",
-      "description": "Source: cam-service\\test\\src\\test_cam_stream.c lines 440-452",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 440
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 452
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-007]\n\tint ret;\n\tuint8_t send_buff[TEST_STREAM_DEPLOY_MSG_BUF];\n\tuint8_t recv_buff[TEST_STREAM_DEPLOY_MSG_BUF];\n\tstruct cam_msg_a2s_deploy *send_msg ="
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_config_deploy.py#L23-L26",
-      "name": "test_config_deploy.py",
-      "description": "Source: test\\test_config_deploy.py lines 23-26",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 23
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 26
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-007]\n        expected_filename = \"84085ddc-bc10-11ed-9a44-7ef9696e9dd3.csd\"\n        expected_filepath = test_dir / expected_filename\n        valid_input_filepath = get_path('config_deploy_v"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_config_deploy.py#L36-L37",
-      "name": "test_config_deploy.py",
-      "description": "Source: test\\test_config_deploy.py lines 36-37",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 36
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 37
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-007]\n        invalid_input_filepath = get_path('config_deploy_invalid.csd')"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_config_deploy.py#L45-L46",
-      "name": "test_config_deploy.py",
-      "description": "Source: test\\test_config_deploy.py lines 45-46",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 45
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 46
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-007]\n        valid_input_filepath = get_path('config_deploy_valid.csd')"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-tool-test-test_cam_message.py#L36-L43",
-      "name": "test_cam_message.py",
-      "description": "Source: cam-tool\\test\\test_cam_message.py lines 36-43",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 36
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 43
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-007]\n    tmp_dir = tmp_path_factory.mktemp(\"test_deploy_message_a2s\",\n                                      numbered=False)\n    uuid = (b'\\x84\\x08\\x5d\\xdc\\xbc\\x10\\x11\\xed'\n            b'\\x9"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-libcam-test-src-test_libcam.c#L281-L285",
-      "name": "test_libcam.c",
-      "description": "Source: libcam\\test\\src\\test_libcam.c lines 281-285",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 281
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 285
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-010]\n\tstruct cam_msg_a2s_start recv_msg;\n\tuint8_t *buffer = (uint8_t *)&recv_msg;\n\tstruct cam_msg_header *header;\n\tint ret;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-libcam-test-src-test_libcam.c#L311-L317",
-      "name": "test_libcam.c",
-      "description": "Source: libcam\\test\\src\\test_libcam.c lines 311-317",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 311
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 317
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-010]\n\tstruct cam_msg_a2s_event recv_msg;\n\tuint8_t *buffer = (uint8_t *)&recv_msg;\n\tuint32_t i;\n\tconst uint16_t event_num = 20;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-libcam-test-src-test_libcam.c#L350-L354",
-      "name": "test_libcam.c",
-      "description": "Source: libcam\\test\\src\\test_libcam.c lines 350-354",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 350
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 354
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-010]\n\tstruct cam_msg_a2s_stop recv_msg;\n\tuint8_t *buffer = (uint8_t *)&recv_msg;\n\tstruct cam_msg_header *header;\n\tint ret;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-libcam-test-src-test_libcam.c#L447-L450",
-      "name": "test_libcam.c",
-      "description": "Source: libcam\\test\\src\\test_libcam.c lines 447-450",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 447
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 450
-          }
-        }
-      ],
-      "comment": "Snippet: // @sdoc[TC-009]\n\tconst uint16_t event_num = 20;\n\tconst uint16_t event_id_num = 5;\n\tint ret;"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_calibration.py#L18-L22",
-      "name": "test_calibration.py",
-      "description": "Source: test\\test_calibration.py lines 18-22",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 18
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 22
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-009]\n        # Check with invalid calibration directory\n        assert (app.run(params=\"--calibration-directory=./false_dir\")\n                == EXIT_FAILURE)\n        # @sdoc[/TC-009]"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_calibration.py#L25-L29",
-      "name": "test_calibration.py",
-      "description": "Source: test\\test_calibration.py lines 25-29",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 25
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 29
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-009]\n        expected_filename = '84085ddc-bc10-11ed-9a44-7ef9696e0000.csel'\n        expected_file_directory = test_dir\n        expected_filepath = expected_file_directory / expected_filena"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_calibration.py#L41-L45",
-      "name": "test_calibration.py",
-      "description": "Source: test\\test_calibration.py lines 41-45",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 41
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 45
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-009]\n        expected_filename = 'calibration_invalid_analyze.csc.yml'\n        input_filename = 'calibration_invalid_analyze.csel'\n        expected_filepath = test_dir / expected_filename\n "
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-test-test_calibration.py#L55-L59",
-      "name": "test_calibration.py",
-      "description": "Source: test\\test_calibration.py lines 55-59",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 55
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 59
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-009]\n        expected_filename = 'calibration_analyze.csc.yml'\n        input_filename = 'calibration_analyze.csel'\n        expected_filepath = test_dir / expected_filename\n        input_cse"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-tool-test-test_cam_csel.py#L42-L47",
-      "name": "test_cam_csel.py",
-      "description": "Source: cam-tool\\test\\test_cam_csel.py lines 42-47",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 42
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 47
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-009]\n    # Invalid data\n    invalid_csel_file('expected_output.csd')\n    invalid_csel_file('no_padding_bytes.csel')\n    invalid_csel_file('invalid_entry_type.csel')"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-cam-tool-test-test_cam_csel.py#L59-L60",
-      "name": "test_cam_csel.py",
-      "description": "Source: cam-tool\\test\\test_cam_csel.py lines 59-60",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 59
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 60
-          }
-        }
-      ],
-      "comment": "Snippet: # @sdoc[TC-009]\n    csel = cam_csel.CamStreamEventLog(get_path('valid.csel'))"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-scripts-generate_spdx3_design_sbom.py#L225-L226",
-      "name": "generate_spdx3_design_sbom.py",
-      "description": "Source: scripts\\generate_spdx3_design_sbom.py lines 225-226",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 225
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 226
-          }
-        }
-      ],
-      "comment": "Snippet: \"\"\"Scan @sdoc[REQ-001] ... @sdoc[/REQ-001] ranges in source files.\"\"\"\n    mapping: Dict[str, List[RangeLink]] = {}"
-    },
-    {
-      "@type": "software_File",
-      "spdxId": "urn:spdx:example:file-scripts-generate_spdx_design_sbom.py#L104-L107",
-      "name": "generate_spdx_design_sbom.py",
-      "description": "Source: scripts\\generate_spdx_design_sbom.py lines 104-107",
-      "primaryPurpose": "source",
-      "contentInformationType": [
-        {
-          "type": "PositionalRange",
-          "beginPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 104
-          },
-          "endPointer": {
-            "type": "LineCharPointer",
-            "lineNumber": 107
-          }
-        }
-      ],
-      "comment": "Snippet: Scan @sdoc[REQ-001] ... @sdoc[/REQ-001] ranges.\n    Returns mapping uid -> list of RangeLink.\n    \"\"\"\n    mapping: Dict[str, List[RangeLink]] = {}"
     },
     {
       "@type": "Relationship",
@@ -3438,366 +2610,6 @@
         "urn:spdx:example:evidence-EVID-012"
       ],
       "comment": "TC-006 has evidence EVID-012"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-138",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-SWA-001",
-      "to": [
-        "urn:spdx:example:file-cam-service-src-cam_socket.c#L136-L186"
-      ],
-      "comment": "SWA-001 implemented in cam_socket.c:136-186"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-139",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-SWA-001",
-      "to": [
-        "urn:spdx:example:file-cam-service-src-cam_socket.c#L301-L311"
-      ],
-      "comment": "SWA-001 implemented in cam_socket.c:301-311"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-140",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-SWA-001",
-      "to": [
-        "urn:spdx:example:file-cam-service-src-cam_socket.c#L432-L478"
-      ],
-      "comment": "SWA-001 implemented in cam_socket.c:432-478"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-141",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-003",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L51-L58"
-      ],
-      "comment": "TC-003 implemented in test_cam_fault.c:51-58"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-142",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-004",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L73-L78"
-      ],
-      "comment": "TC-004 implemented in test_cam_fault.c:73-78"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-143",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-004",
-      "to": [
-        "urn:spdx:example:file-test-test_static_config.py#L133-L136"
-      ],
-      "comment": "TC-004 implemented in test_static_config.py:133-136"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-144",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-005",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L93-L102"
-      ],
-      "comment": "TC-005 implemented in test_cam_fault.c:93-102"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-145",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-002",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L120-L129"
-      ],
-      "comment": "TC-002 implemented in test_cam_fault.c:120-129"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-146",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-002",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L1071-L1088"
-      ],
-      "comment": "TC-002 implemented in test_cam_stream.c:1071-1088"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-147",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-002",
-      "to": [
-        "urn:spdx:example:file-test-test_static_config.py#L163-L165"
-      ],
-      "comment": "TC-002 implemented in test_static_config.py:163-165"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-148",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-001",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_fault.c#L151-L160"
-      ],
-      "comment": "TC-001 implemented in test_cam_fault.c:151-160"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-149",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-001",
-      "to": [
-        "urn:spdx:example:file-test-test_static_config.py#L147-L150"
-      ],
-      "comment": "TC-001 implemented in test_static_config.py:147-150"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-150",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-006",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L258-L260"
-      ],
-      "comment": "TC-006 implemented in test_cam_stream.c:258-260"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-151",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-006",
-      "to": [
-        "urn:spdx:example:file-test-test_static_config.py#L105-L110"
-      ],
-      "comment": "TC-006 implemented in test_static_config.py:105-110"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-152",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-006",
-      "to": [
-        "urn:spdx:example:file-cam-tool-test-test_cam_csc.py#L60-L62"
-      ],
-      "comment": "TC-006 implemented in test_cam_csc.py:60-62"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-153",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-006",
-      "to": [
-        "urn:spdx:example:file-cam-tool-test-test_cam_csc.py#L82-L83"
-      ],
-      "comment": "TC-006 implemented in test_cam_csc.py:82-83"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-154",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-011",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L347-L353"
-      ],
-      "comment": "TC-011 implemented in test_cam_stream.c:347-353"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-155",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-011",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L361-L368"
-      ],
-      "comment": "TC-011 implemented in test_cam_stream.c:361-368"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-156",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-008",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L386-L399"
-      ],
-      "comment": "TC-008 implemented in test_cam_stream.c:386-399"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-157",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-007",
-      "to": [
-        "urn:spdx:example:file-cam-service-test-src-test_cam_stream.c#L440-L452"
-      ],
-      "comment": "TC-007 implemented in test_cam_stream.c:440-452"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-158",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-007",
-      "to": [
-        "urn:spdx:example:file-test-test_config_deploy.py#L23-L26"
-      ],
-      "comment": "TC-007 implemented in test_config_deploy.py:23-26"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-159",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-007",
-      "to": [
-        "urn:spdx:example:file-test-test_config_deploy.py#L36-L37"
-      ],
-      "comment": "TC-007 implemented in test_config_deploy.py:36-37"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-160",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-007",
-      "to": [
-        "urn:spdx:example:file-test-test_config_deploy.py#L45-L46"
-      ],
-      "comment": "TC-007 implemented in test_config_deploy.py:45-46"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-161",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-007",
-      "to": [
-        "urn:spdx:example:file-cam-tool-test-test_cam_message.py#L36-L43"
-      ],
-      "comment": "TC-007 implemented in test_cam_message.py:36-43"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-162",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-010",
-      "to": [
-        "urn:spdx:example:file-libcam-test-src-test_libcam.c#L281-L285"
-      ],
-      "comment": "TC-010 implemented in test_libcam.c:281-285"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-163",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-010",
-      "to": [
-        "urn:spdx:example:file-libcam-test-src-test_libcam.c#L311-L317"
-      ],
-      "comment": "TC-010 implemented in test_libcam.c:311-317"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-164",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-010",
-      "to": [
-        "urn:spdx:example:file-libcam-test-src-test_libcam.c#L350-L354"
-      ],
-      "comment": "TC-010 implemented in test_libcam.c:350-354"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-165",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-009",
-      "to": [
-        "urn:spdx:example:file-libcam-test-src-test_libcam.c#L447-L450"
-      ],
-      "comment": "TC-009 implemented in test_libcam.c:447-450"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-166",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-009",
-      "to": [
-        "urn:spdx:example:file-test-test_calibration.py#L18-L22"
-      ],
-      "comment": "TC-009 implemented in test_calibration.py:18-22"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-167",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-009",
-      "to": [
-        "urn:spdx:example:file-test-test_calibration.py#L25-L29"
-      ],
-      "comment": "TC-009 implemented in test_calibration.py:25-29"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-168",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-009",
-      "to": [
-        "urn:spdx:example:file-test-test_calibration.py#L41-L45"
-      ],
-      "comment": "TC-009 implemented in test_calibration.py:41-45"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-169",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-009",
-      "to": [
-        "urn:spdx:example:file-test-test_calibration.py#L55-L59"
-      ],
-      "comment": "TC-009 implemented in test_calibration.py:55-59"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-170",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-009",
-      "to": [
-        "urn:spdx:example:file-cam-tool-test-test_cam_csel.py#L42-L47"
-      ],
-      "comment": "TC-009 implemented in test_cam_csel.py:42-47"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-171",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-TC-009",
-      "to": [
-        "urn:spdx:example:file-cam-tool-test-test_cam_csel.py#L59-L60"
-      ],
-      "comment": "TC-009 implemented in test_cam_csel.py:59-60"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-172",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-REQ-001",
-      "to": [
-        "urn:spdx:example:file-scripts-generate_spdx3_design_sbom.py#L225-L226"
-      ],
-      "comment": "REQ-001 implemented in generate_spdx3_design_sbom.py:225-226"
-    },
-    {
-      "@type": "Relationship",
-      "spdxId": "urn:spdx:example:relationship-rel-173",
-      "relationshipType": "testedOn",
-      "from": "urn:spdx:example:element-REQ-001",
-      "to": [
-        "urn:spdx:example:file-scripts-generate_spdx_design_sbom.py#L104-L107"
-      ],
-      "comment": "REQ-001 implemented in generate_spdx_design_sbom.py:104-107"
     }
   ]
 }
