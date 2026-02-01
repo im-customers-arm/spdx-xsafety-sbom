@@ -141,30 +141,31 @@ class StrictDocParser:
             # Run strictdoc export from the source directory
             # This ensures grammar files are resolved relative to the .sdoc files
             #
-            # Find strictdoc executable - prefer system Python over venv
-            # because some venv versions (0.16.x) have issues with grammar imports
+            # Use the strictdoc CLI from the current Python environment
             import os
             import shutil
+            import sys
 
-            # Try to find system Python's strictdoc first
-            system_python_scripts = None
-            for possible_path in [
-                # Windows common paths
-                Path(os.path.expanduser("~")) / "AppData" / "Local" / "Programs" / "Python" / "Python312" / "Scripts" / "strictdoc.exe",
-                Path(os.path.expanduser("~")) / "AppData" / "Local" / "Programs" / "Python" / "Python311" / "Scripts" / "strictdoc.exe",
-                Path(os.path.expanduser("~")) / "AppData" / "Local" / "Programs" / "Python" / "Python310" / "Scripts" / "strictdoc.exe",
-                # Linux/Mac
-                Path("/usr/local/bin/strictdoc"),
-                Path("/usr/bin/strictdoc"),
-            ]:
-                if possible_path.exists():
-                    system_python_scripts = str(possible_path)
-                    break
-
-            strictdoc_cmd = system_python_scripts or shutil.which("strictdoc")
+            # Find strictdoc in the current environment (venv or system)
+            # Check if we're in a venv and use its Scripts directory
+            strictdoc_cmd = None
+            if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
+                # We're in a virtual environment
+                if os.name == 'nt':  # Windows
+                    venv_strictdoc = Path(sys.prefix) / "Scripts" / "strictdoc.exe"
+                else:  # Linux/Mac
+                    venv_strictdoc = Path(sys.prefix) / "bin" / "strictdoc"
+                
+                if venv_strictdoc.exists():
+                    strictdoc_cmd = str(venv_strictdoc)
+            
+            # Fallback to shutil.which
+            if not strictdoc_cmd:
+                strictdoc_cmd = shutil.which("strictdoc")
+            
             if not strictdoc_cmd:
                 raise RuntimeError(
-                    "StrictDoc CLI not found. Install with: pip install strictdoc"
+                    "StrictDoc CLI not found. Install with: uv add strictdoc"
                 )
 
             logger.debug("Using StrictDoc at: %s", strictdoc_cmd)
@@ -180,22 +181,8 @@ class StrictDocParser:
             ]
 
             try:
-                # Create a clean environment without our venv
-                # This allows using the system StrictDoc which may have
-                # different/compatible behavior with custom grammars
-                import os
-
-                clean_env = os.environ.copy()
-                # Remove virtual environment paths to use system Python/StrictDoc
-                clean_env.pop("VIRTUAL_ENV", None)
-                if "PATH" in clean_env:
-                    # Filter out venv paths from PATH
-                    venv_path = os.environ.get("VIRTUAL_ENV", "")
-                    if venv_path:
-                        paths = clean_env["PATH"].split(os.pathsep)
-                        paths = [p for p in paths if not p.startswith(venv_path)]
-                        clean_env["PATH"] = os.pathsep.join(paths)
-
+                # Use current environment - python -m strictdoc will use
+                # the correct StrictDoc version from this environment
                 result = subprocess.run(
                     cmd,
                     capture_output=True,
@@ -203,7 +190,6 @@ class StrictDocParser:
                     timeout=120,
                     check=False,
                     cwd=str(self.path),  # Run from the StrictDoc directory
-                    env=clean_env,
                 )
 
                 if result.returncode != 0:
