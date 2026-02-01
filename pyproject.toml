@@ -16,7 +16,7 @@ classifiers = [
     "Topic :: Software Development :: Quality Assurance",
 ]
 
-dependencies = ["click>=8.1.0", "rich>=13.0.0", "pydantic>=2.0.0", "strictdoc>=0.0.59,<0.1.0"]
+dependencies = ["click>=8.1.0", "rich>=13.0.0", "pydantic>=2.0.0", "strictdoc>=0.0.59,<0.1.0", "setuptools"]
 
 [project.optional-dependencies]
 validation = ["pyshacl>=0.25.0", "rdflib>=7.0.0", "pyld>=2.0.0", "jsonschema>=4.0.0"]
