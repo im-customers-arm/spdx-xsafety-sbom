@@ -29,6 +29,14 @@ try:
     from strictdoc.backend.sdoc.reader import SDReader
 
     _STRICTDOC_AVAILABLE = True
+    
+    # Import TextX exceptions for better error handling
+    try:
+        from textx.exceptions import TextXSyntaxError
+        _TEXTX_AVAILABLE = True
+    except ImportError:
+        _TEXTX_AVAILABLE = False
+        TextXSyntaxError = Exception  # Fallback
 except ImportError as e:
     raise ImportError(
         "StrictDoc library is required for native parsing. "
@@ -67,6 +75,70 @@ class StrictDocParser:
         self._nodes: dict[str, StrictDocNode] = {}
         self._documents: list[Any] = []
 
+    def _format_syntax_error(self, error: Exception, file_path: Path) -> str:
+        """
+        Format a StrictDoc syntax error with helpful guidance.
+
+        Args:
+            error: The exception that was raised.
+            file_path: Path to the file being parsed.
+
+        Returns:
+            Formatted error message with guidance.
+        """
+        error_msg = str(error)
+        
+        # Extract line and column info if available
+        import re
+        line_match = re.search(r":(\d+):(\d+):", error_msg)
+        if line_match:
+            line_num = int(line_match.group(1))
+            col_num = int(line_match.group(2))
+            
+            # Try to show the problematic line
+            try:
+                with open(file_path, encoding="utf-8") as f:
+                    lines = f.readlines()
+                    if 0 <= line_num - 1 < len(lines):
+                        problem_line = lines[line_num - 1].rstrip()
+                        
+                        msg_parts = [
+                            f"\n{'='*70}",
+                            f"StrictDoc Syntax Error in: {file_path}",
+                            f"{'='*70}",
+                            f"Line {line_num}, Column {col_num}:",
+                            f"  {problem_line}",
+                            f"  {' ' * (col_num - 1)}^",
+                            "",
+                            f"Error: {error_msg}",
+                            "",
+                            "Common fixes:",
+                            "  1. Check for missing colons after field names (e.g., 'FREETEXT:' not 'FREETEXT]')",
+                            "  2. Ensure proper field name format: UPPERCASE with optional underscores",
+                            "  3. Verify closing brackets/tags are properly matched",
+                            "  4. Check for invalid characters in field names",
+                            "",
+                            "Valid field names: UID, TITLE, STATEMENT, FREETEXT, ASIL, REFS, etc.",
+                            "",
+                            "For more details, run:",
+                            f"  uv run strictdoc --debug export {file_path.parent}",
+                            f"{'='*70}\n",
+                        ]
+                        return "\n".join(msg_parts)
+            except Exception:
+                pass  # Fall through to basic message
+        
+        # Fallback message
+        return (
+            f"\nStrictDoc parsing error in {file_path}:\n"
+            f"  {error_msg}\n\n"
+            f"Common causes:\n"
+            f"  - Malformed field syntax (missing colons, invalid brackets)\n"
+            f"  - Invalid field names (must be UPPERCASE)\n"
+            f"  - Unclosed tags or mismatched delimiters\n\n"
+            f"Run 'uv run strictdoc --debug export {file_path.parent}' for details.\n"
+        )
+
     def parse(self) -> dict[str, StrictDocNode]:
         """
         Parse StrictDoc .sdoc files.
@@ -82,7 +154,28 @@ class StrictDocParser:
 
         if self.path.is_file():
             if self.path.suffix == ".sdoc":
-                self._parse_native_file(self.path)
+                # Check if parent directory has custom grammars
+                parent_dir = self.path.parent
+                sgra_files = list(parent_dir.glob("**/*.sgra"))
+                
+                if sgra_files:
+                    # Custom grammars detected - must use export-based parsing
+                    # Parse the entire parent directory instead of just this file
+                    logger.info(
+                        "Custom grammar files detected in %s. "
+                        "Using export-based parsing for entire directory.",
+                        parent_dir,
+                    )
+                    # Temporarily switch to directory mode
+                    original_path = self.path
+                    self.path = parent_dir
+                    try:
+                        self._parse_via_export()
+                    finally:
+                        self.path = original_path
+                else:
+                    # No custom grammars - safe to use native parsing
+                    self._parse_native_file(self.path)
             else:
                 raise ValueError(
                     f"Unsupported file type: {self.path.suffix}. "
@@ -94,7 +187,25 @@ class StrictDocParser:
             sdoc_files = list(self.path.glob("**/*.sdoc"))
 
             if not sdoc_files:
-                logger.warning("No .sdoc files found in %s", self.path)
+                error_msg = (
+                    f"\nNo StrictDoc (.sdoc) files found in: {self.path}\n\n"
+                    f"Please ensure:\n"
+                    f"  1. The directory contains .sdoc files\n"
+                    f"  2. Files have the .sdoc extension (not .txt or .md)\n"
+                    f"  3. The path is correct: {self.path.absolute()}\n\n"
+                    f"Directory contents:\n"
+                )
+                # Show first few files to help user
+                try:
+                    all_files = list(self.path.glob("**/*"))[:10]
+                    if all_files:
+                        error_msg += "  " + "\n  ".join(str(f.relative_to(self.path)) for f in all_files if f.is_file())
+                    else:
+                        error_msg += "  (directory is empty)"
+                except Exception:
+                    error_msg += "  (unable to list files)"
+                
+                logger.warning(error_msg)
                 return {}
 
             if sgra_files:
@@ -193,12 +304,60 @@ class StrictDocParser:
                 )
 
                 if result.returncode != 0:
-                    logger.error("StrictDoc export failed: %s", result.stderr)
-                    logger.error("stdout: %s", result.stdout)
-                    raise RuntimeError(
-                        f"StrictDoc export failed with code {result.returncode}: "
-                        f"{result.stderr or result.stdout}"
-                    )
+                    error_output = result.stderr or result.stdout or "Unknown error"
+                    
+                    # Check for common error patterns
+                    if "TextXSyntaxError" in error_output:
+                        error_msg = (
+                            f"\n{'='*70}\n"
+                            f"StrictDoc Export Failed: Syntax Error Detected\n"
+                            f"{'='*70}\n"
+                            f"{error_output}\n\n"
+                            f"This indicates a syntax error in one of your .sdoc files.\n\n"
+                            f"Common fixes:\n"
+                            f"  1. Check field names have colons: 'FREETEXT:' not 'FREETEXT]'\n"
+                            f"  2. Ensure field names are UPPERCASE: 'UID' not 'uid'\n"
+                            f"  3. Verify brackets and tags are properly matched\n"
+                            f"  4. Check for special characters in unexpected places\n\n"
+                            f"To find the exact error:\n"
+                            f"  cd {self.path}\n"
+                            f"  uv run strictdoc --debug export .\n"
+                            f"{'='*70}\n"
+                        )
+                    elif "Could not parse file" in error_output:
+                        # Extract filename if possible
+                        import re
+                        file_match = re.search(r"Could not parse file: ([^\n]+)", error_output)
+                        problem_file = file_match.group(1) if file_match else "unknown"
+                        error_msg = (
+                            f"\n{'='*70}\n"
+                            f"StrictDoc Export Failed: Parse Error\n"
+                            f"{'='*70}\n"
+                            f"Problem file: {problem_file}\n\n"
+                            f"{error_output}\n\n"
+                            f"Troubleshooting steps:\n"
+                            f"  1. Open the file and check for syntax errors\n"
+                            f"  2. Validate against StrictDoc documentation\n"
+                            f"  3. Look for missing or extra brackets/tags\n"
+                            f"  4. Check for invalid field names\n\n"
+                            f"For debugging:\n"
+                            f"  uv run strictdoc --debug export {self.path}\n"
+                            f"{'='*70}\n"
+                        )
+                    else:
+                        error_msg = (
+                            f"\nStrictDoc export failed with exit code {result.returncode}\n"
+                            f"{'='*70}\n"
+                            f"{error_output}\n"
+                            f"{'='*70}\n\n"
+                            f"Working directory: {self.path}\n\n"
+                            f"Try running manually for more details:\n"
+                            f"  cd {self.path}\n"
+                            f"  uv run strictdoc --debug export .\n"
+                        )
+                    
+                    logger.error(error_msg)
+                    raise RuntimeError(error_msg)
 
             except subprocess.TimeoutExpired as err:
                 logger.error("StrictDoc export timed out")
@@ -330,26 +489,52 @@ class StrictDocParser:
 
         StrictDoc's SDReader doesn't resolve IMPORT_FROM_FILE directives,
         so we need to inline the grammar content before parsing.
+        
+        Note: Custom grammars (.sgra files) are better handled by the
+        export-based parsing approach. This method is for simple cases only.
 
         Args:
             content: The .sdoc file content.
             base_path: Base path for resolving relative grammar file paths.
 
         Returns:
-            Content with grammar file inlined.
+            Content with grammar file inlined, or raises ValueError if
+            custom grammar is detected (should use export instead).
         """
         import re
 
-        pattern = r"\[GRAMMAR\]\nIMPORT_FROM_FILE:\s*(\S+)"
+        # Check for IMPORT_FROM_FILE directive
+        pattern = r"\[GRAMMAR\]\s*\nIMPORT_FROM_FILE:\s*(\S+)"
         match = re.search(pattern, content)
         if match:
             grammar_filename = match.group(1)
             grammar_path = base_path / grammar_filename
+            
+            # If the grammar file exists and is a .sgra (custom grammar),
+            # raise an error indicating export-based parsing is needed
+            if grammar_path.exists() and grammar_path.suffix == ".sgra":
+                raise ValueError(
+                    f"\n{'='*70}\n"
+                    f"Custom Grammar Detected: {grammar_filename}\n"
+                    f"{'='*70}\n"
+                    f"This file uses a custom StrictDoc grammar (.sgra file).\n"
+                    f"Custom grammars require export-based parsing.\n\n"
+                    f"To validate files with custom grammars:\n"
+                    f"  1. Validate the entire directory (not individual files):\n"
+                    f"     uv run python scripts/validate_sdoc_files.py {base_path}\n\n"
+                    f"  2. Or use StrictDoc directly:\n"
+                    f"     uv run strictdoc export {base_path}\n\n"
+                    f"The parser will automatically use export-based parsing\n"
+                    f"when validating a directory containing .sgra files.\n"
+                    f"{'='*70}\n"
+                )
+            
+            # For non-custom grammars, inline them
             if grammar_path.exists():
                 with open(grammar_path, encoding="utf-8") as f:
                     grammar_text = f.read()
-                # Replace the import directive with the actual grammar content
-                content = re.sub(pattern, grammar_text, content)
+                # Replace the entire [GRAMMAR] block with the inlined grammar
+                content = re.sub(pattern, f"[GRAMMAR]\n{grammar_text}", content)
                 logger.debug("Inlined grammar from %s", grammar_path)
         return content
 
@@ -367,8 +552,46 @@ class StrictDocParser:
             self._documents.append(document)
             self._parse_native_document(document, sdoc_file)
 
+        except FileNotFoundError as e:
+            error_msg = (
+                f"\nStrictDoc file not found: {sdoc_file}\n"
+                f"Please verify the file path is correct.\n"
+            )
+            logger.error(error_msg)
+            raise FileNotFoundError(error_msg) from e
+        except UnicodeDecodeError as e:
+            error_msg = (
+                f"\nEncoding error in StrictDoc file: {sdoc_file}\n"
+                f"The file appears to have invalid UTF-8 encoding.\n"
+                f"Try saving the file with UTF-8 encoding.\n"
+            )
+            logger.error(error_msg)
+            raise ValueError(error_msg) from e
         except Exception as e:
-            logger.error("Failed to parse %s: %s", sdoc_file, e)
+            # Check if it's a TextX syntax error
+            if _TEXTX_AVAILABLE and isinstance(e, TextXSyntaxError):
+                formatted_error = self._format_syntax_error(e, sdoc_file)
+                logger.error(formatted_error)
+                raise ValueError(formatted_error) from e
+            elif "TextXSyntaxError" in type(e).__name__:
+                # TextX error but we don't have the class imported
+                formatted_error = self._format_syntax_error(e, sdoc_file)
+                logger.error(formatted_error)
+                raise ValueError(formatted_error) from e
+            else:
+                # Other parsing errors
+                error_msg = (
+                    f"\nFailed to parse StrictDoc file: {sdoc_file}\n"
+                    f"Error: {e}\n\n"
+                    f"Possible causes:\n"
+                    f"  - Invalid StrictDoc syntax\n"
+                    f"  - Unsupported grammar features\n"
+                    f"  - File corruption\n\n"
+                    f"For detailed debugging:\n"
+                    f"  uv run strictdoc --debug export {sdoc_file.parent}\n"
+                )
+                logger.error(error_msg)
+                raise ValueError(error_msg) from e
 
     def _parse_native_document(
         self,
