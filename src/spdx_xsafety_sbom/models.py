@@ -61,6 +61,16 @@ class StrictDocNode:
     controllability: str | None = None
     """ISO 26262 controllability rating (C0-C3)."""
 
+    # Evidence-specific fields
+    evidence_artifact_id: str | None = None
+    """Path or URI to the evidence artifact (from ARTIFACT_ID)."""
+
+    evidence_timestamp_utc: str | None = None
+    """Evidence timestamp in UTC (from TIMESTAMP_UTC)."""
+
+    evidence_hash: str | None = None
+    """Evidence hash string (from HASH)."""
+
     # Links and relationships
     parent_uids: list[str] = field(default_factory=list)
     """UIDs of parent requirements (via RELATIONS)."""

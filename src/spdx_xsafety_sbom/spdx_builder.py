@@ -382,6 +382,13 @@ class SPDX3Builder:
             "xSafety:evidenceType": evidence_type,
         }
 
+        if node.evidence_artifact_id:
+            extension["xSafety:artifactId"] = node.evidence_artifact_id
+        if node.evidence_timestamp_utc:
+            extension["xSafety:evidenceTimestampUtc"] = node.evidence_timestamp_utc
+        if node.evidence_hash:
+            extension["xSafety:artifactHash"] = node.evidence_hash
+
         element = {
             "@type": "software_File",
             "spdxId": spdx_id,

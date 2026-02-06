@@ -73,6 +73,35 @@ class TestValidateStructure:
 
         assert any("Duplicate spdxId" in e for e in result.errors)
 
+    def test_evidence_extension_metadata_type_validation(self) -> None:
+        """Test evidence metadata fields must be strings when present."""
+        document = {
+            "@context": ["https://spdx.org/rdf/3.0.1/spdx-context.jsonld"],
+            "@graph": [
+                {
+                    "@type": "SpdxDocument",
+                    "spdxId": "urn:test:document",
+                    "name": "doc",
+                    "specVersion": "3.0.1",
+                    "creationInfo": {"created": "2026-02-06T00:00:00Z", "createdBy": []},
+                },
+                {
+                    "@type": "software_File",
+                    "spdxId": "urn:test:evidence-EVID-001",
+                    "name": "EVID-001",
+                    "extension": [
+                        {
+                            "type": "xSafety:SafetyEvidenceExtension",
+                            "xSafety:evidenceType": "testResult",
+                            "xSafety:artifactId": 123,
+                        }
+                    ],
+                },
+            ],
+        }
+        result = validate_structure(document)
+        assert any("non-string artifactId" in e for e in result.errors)
+
 
 class TestValidateSbom:
     """Tests for full SBOM validation."""

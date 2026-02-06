@@ -198,6 +198,9 @@ This specification defines the xSafety extension for SPDX 3.0.1, enabling docume
 | evidenceType | EvidenceType | 1 | 1 | Classification of evidence |
 | evidenceResult | EvidenceResult | 0 | 1 | Outcome |
 | validUntil | xsd:dateTime | 0 | 1 | Expiration date |
+| artifactId | xsd:string | 0 | 1 | Raw evidence artifact path or URI |
+| evidenceTimestampUtc | xsd:dateTime | 0 | 1 | Evidence capture timestamp in UTC |
+| artifactHash | xsd:string | 0 | 1 | Artifact hash string (for example, `sha256:...`) |
 
 #### Usage
 
@@ -211,7 +214,10 @@ This specification defines the xSafety extension for SPDX 3.0.1, enabling docume
   "extension": [{
     "type": "xSafety:SafetyEvidenceExtension",
     "xSafety:evidenceType": "testResult",
-    "xSafety:evidenceResult": "pass"
+    "xSafety:evidenceResult": "pass",
+    "xSafety:artifactId": "docs/strictdoc/evidence/EVID-015-results.txt",
+    "xSafety:evidenceTimestampUtc": "2025-12-12T18:02:11Z",
+    "xSafety:artifactHash": "sha256:6f2b4d9f1a2b..."
   }]
 }
 ```

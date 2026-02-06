@@ -314,6 +314,23 @@ def _validate_extension(
             result.errors.append(
                 f"SafetyEvidenceExtension on {parent_id} missing evidenceType"
             )
+        artifact_id = ext.get("xSafety:artifactId")
+        if artifact_id is not None and not isinstance(artifact_id, str):
+            result.errors.append(
+                f"SafetyEvidenceExtension on {parent_id} has non-string artifactId"
+            )
+
+        artifact_hash = ext.get("xSafety:artifactHash")
+        if artifact_hash is not None and not isinstance(artifact_hash, str):
+            result.errors.append(
+                f"SafetyEvidenceExtension on {parent_id} has non-string artifactHash"
+            )
+
+        evidence_timestamp = ext.get("xSafety:evidenceTimestampUtc")
+        if evidence_timestamp is not None and not isinstance(evidence_timestamp, str):
+            result.errors.append(
+                f"SafetyEvidenceExtension on {parent_id} has non-string evidenceTimestampUtc"
+            )
 
     elif ext_type == "xSafety:SafetyTestExtension" and "xSafety:testType" not in ext:
         result.errors.append(f"SafetyTestExtension on {parent_id} missing testType")

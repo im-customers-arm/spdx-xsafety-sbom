@@ -125,6 +125,35 @@ class TestSPDX3Builder:
         ext = element["extension"][0]
         assert ext["type"] == "xSafety:SafetyTestExtension"
 
+    def test_build_evidence_element_with_metadata(self) -> None:
+        """Test building evidence element with raw artifact metadata."""
+        builder = SPDX3Builder()
+
+        node = StrictDocNode(
+            uid="EVID-001",
+            title="Evidence",
+            statement="Evidence description",
+            evidence_artifact_id="docs/strictdoc/evidence/EVID-001-temporal-fault-detection.txt",
+            evidence_timestamp_utc="2025-12-12T18:02:11Z",
+            evidence_hash="sha256:6f2b4d9f1a2b3c",
+        )
+
+        element = builder.build_evidence_element(node)
+
+        assert element["@type"] == "software_File"
+        assert element["name"] == "EVID-001"
+        assert element["primaryPurpose"] == "evidence"
+
+        ext = element["extension"][0]
+        assert ext["type"] == "xSafety:SafetyEvidenceExtension"
+        assert ext["xSafety:evidenceType"] == "testResult"
+        assert (
+            ext["xSafety:artifactId"]
+            == "docs/strictdoc/evidence/EVID-001-temporal-fault-detection.txt"
+        )
+        assert ext["xSafety:evidenceTimestampUtc"] == "2025-12-12T18:02:11Z"
+        assert ext["xSafety:artifactHash"] == "sha256:6f2b4d9f1a2b3c"
+
     def test_build_node_element_dispatches_correctly(self) -> None:
         """Test build_node_element dispatches to correct builder."""
         builder = SPDX3Builder()
@@ -133,16 +162,19 @@ class TestSPDX3Builder:
         sg_node = StrictDocNode(uid="SG-001", statement="Safety goal")
         ssr_node = StrictDocNode(uid="SSR-001", statement="Requirement")
         tc_node = StrictDocNode(uid="TC-001", statement="Test")
+        evid_node = StrictDocNode(uid="EVID-001", statement="Evidence")
 
         haz_elem = builder.build_node_element(haz_node)
         sg_elem = builder.build_node_element(sg_node)
         ssr_elem = builder.build_node_element(ssr_node)
         tc_elem = builder.build_node_element(tc_node)
+        evid_elem = builder.build_node_element(evid_node)
 
         assert haz_elem["extension"][0]["type"] == "xSafety:HazardExtension"
         assert sg_elem["extension"][0]["type"] == "xSafety:SafetyGoalExtension"
         assert ssr_elem["extension"][0]["type"] == "xSafety:SafetyRequirementExtension"
         assert tc_elem["extension"][0]["type"] == "xSafety:SafetyTestExtension"
+        assert evid_elem["extension"][0]["type"] == "xSafety:SafetyEvidenceExtension"
 
     def test_build_document(self) -> None:
         """Test building complete SPDX document."""

@@ -437,6 +437,9 @@ class StrictDocParser:
         severity = node.get("SEVERITY")
         exposure = node.get("EXPOSURE")
         controllability = node.get("CONTROLLABILITY")
+        evidence_artifact_id = node.get("ARTIFACT_ID")
+        evidence_timestamp_utc = node.get("TIMESTAMP_UTC")
+        evidence_hash = node.get("HASH")
 
         # Extract parent UIDs from RELATIONS
         parent_uids = self._extract_json_parent_uids(node)
@@ -453,6 +456,9 @@ class StrictDocParser:
             severity=severity,
             exposure=exposure,
             controllability=controllability,
+            evidence_artifact_id=evidence_artifact_id,
+            evidence_timestamp_utc=evidence_timestamp_utc,
+            evidence_hash=evidence_hash,
             parent_uids=parent_uids,
             document_path=None,  # Not available from JSON
         )
@@ -656,6 +662,9 @@ class StrictDocParser:
         severity = self._get_native_field_value(node, "SEVERITY")
         exposure = self._get_native_field_value(node, "EXPOSURE")
         controllability = self._get_native_field_value(node, "CONTROLLABILITY")
+        evidence_artifact_id = self._get_native_field_value(node, "ARTIFACT_ID")
+        evidence_timestamp_utc = self._get_native_field_value(node, "TIMESTAMP_UTC")
+        evidence_hash = self._get_native_field_value(node, "HASH")
 
         # Extract parent UIDs from relations
         parent_uids = self._extract_native_parent_uids(node)
@@ -672,6 +681,9 @@ class StrictDocParser:
             severity=severity,
             exposure=exposure,
             controllability=controllability,
+            evidence_artifact_id=evidence_artifact_id,
+            evidence_timestamp_utc=evidence_timestamp_utc,
+            evidence_hash=evidence_hash,
             parent_uids=parent_uids,
             document_path=source_file,
         )

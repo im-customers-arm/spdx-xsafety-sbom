@@ -167,6 +167,27 @@ xSafety:SafetyEvidenceExtensionShape
         sh:datatype xsd:dateTime ;
         sh:message "xSafety:validUntil must be a valid dateTime" ;
         sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:artifactId ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "xSafety:artifactId must be a string path or URI" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:evidenceTimestampUtc ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:dateTime ;
+        sh:message "xSafety:evidenceTimestampUtc must be a valid dateTime" ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path xSafety:artifactHash ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "xSafety:artifactHash must be a string (for example, sha256:...)" ;
+        sh:severity sh:Violation ;
     ] .
 
 # ==============================================================================

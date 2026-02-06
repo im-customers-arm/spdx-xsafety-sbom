@@ -49,6 +49,18 @@
       "@id": "xSafety:validUntil",
       "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
     },
+    "xSafety:artifactId": {
+      "@id": "xSafety:artifactId",
+      "@type": "http://www.w3.org/2001/XMLSchema#string"
+    },
+    "xSafety:evidenceTimestampUtc": {
+      "@id": "xSafety:evidenceTimestampUtc",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "xSafety:artifactHash": {
+      "@id": "xSafety:artifactHash",
+      "@type": "http://www.w3.org/2001/XMLSchema#string"
+    },
     "xSafety:testType": {
       "@id": "xSafety:testType",
       "@type": "@vocab"

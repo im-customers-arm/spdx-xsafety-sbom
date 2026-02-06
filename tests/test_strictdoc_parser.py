@@ -84,3 +84,29 @@ class TestStrictDocParser:
 
         assert len(nodes) > 0
         assert "HAZ-001" in nodes
+
+    def test_parse_json_node_extracts_evidence_metadata(self, tmp_path: Path) -> None:
+        """Test JSON parsing captures EVID metadata fields."""
+        parser = StrictDocParser(tmp_path)
+
+        parser._parse_json_node(
+            {
+                "UID": "EVID-001",
+                "NODE_TYPE": "EVIDENCE",
+                "TITLE": "Temporal fault evidence",
+                "STATEMENT": "Logs for temporal fault case",
+                "ARTIFACT_ID": "docs/strictdoc/evidence/EVID-001-temporal-fault-detection.txt",
+                "TIMESTAMP_UTC": "2025-12-12T18:02:11Z",
+                "HASH": "sha256:6f2b4d9f1a2b3c",
+                "RELATIONS": [{"TYPE": "Parent", "VALUE": "TC-001"}],
+            }
+        )
+
+        evid = parser._nodes.get("EVID-001")
+        assert evid is not None
+        assert (
+            evid.evidence_artifact_id
+            == "docs/strictdoc/evidence/EVID-001-temporal-fault-detection.txt"
+        )
+        assert evid.evidence_timestamp_utc == "2025-12-12T18:02:11Z"
+        assert evid.evidence_hash == "sha256:6f2b4d9f1a2b3c"
