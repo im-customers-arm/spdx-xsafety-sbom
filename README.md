@@ -34,6 +34,25 @@ Unlike traditional SBOMs that document software packages and dependencies, a **D
 
 ## Installation
 
+### Option 1: Pre-built Executables (Recommended for CI/CD)
+
+Download standalone executables from the [GitHub Releases](https://github.com/im-customers-arm/spdx-xsafety-sbom/releases) page. No Python installation required.
+
+| Platform | Download |
+|----------|----------|
+| Linux (x64) | `spdx-xsafety-sbom-vX.Y.Z-linux-x64` |
+| Windows (x64) | `spdx-xsafety-sbom-vX.Y.Z-windows-x64.exe` |
+| macOS (ARM64) | `spdx-xsafety-sbom-vX.Y.Z-macos-arm64` |
+
+```bash
+# Example: Download and run on Linux
+curl -LO https://github.com/im-customers-arm/spdx-xsafety-sbom/releases/latest/download/spdx-xsafety-sbom-v0.1.0-linux-x64
+chmod +x spdx-xsafety-sbom-v0.1.0-linux-x64
+./spdx-xsafety-sbom-v0.1.0-linux-x64 generate --help
+```
+
+### Option 2: Install from Source
+
 ### Prerequisites
 
 - **Python 3.12+**
@@ -204,6 +223,35 @@ uv run ruff format spdx_xsafety_sbom/
 ```bash
 uv run mypy spdx_xsafety_sbom/ --strict
 ```
+
+### Building Executables
+
+To build a standalone executable for your platform:
+
+```bash
+uv sync --dev
+uv run python scripts/build_executable.py
+```
+
+The executable will be created in `dist/` with platform-specific naming.
+
+## Releasing
+
+Releases are automated via GitHub Actions. To create a new release:
+
+1. Update version in [pyproject.toml](pyproject.toml) and [src/spdx_xsafety_sbom/__init__.py](src/spdx_xsafety_sbom/__init__.py)
+2. Commit the version bump
+3. Create and push a version tag:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The release workflow will automatically:
+- Build executables for Linux, Windows, and macOS
+- Create a GitHub Release with all artifacts and checksums
+- Publish to PyPI (for non-prerelease versions)
 
 ## Reference Specifications
 

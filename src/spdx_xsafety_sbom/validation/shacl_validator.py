@@ -14,17 +14,13 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from spdx_xsafety_sbom.paths import get_shacl_shapes_path
 from spdx_xsafety_sbom.validation.spdx_validator import ValidationResult
 
 logger = logging.getLogger(__name__)
 
-# Path to SHACL shapes file (relative to package)
-SHAPES_PATH = (
-    Path(__file__).parent.parent.parent.parent
-    / "spdx_extensions"
-    / "shacl"
-    / "safety-shapes.ttl"
-)
+# Path to SHACL shapes file (supports both frozen and development environments)
+SHAPES_PATH = get_shacl_shapes_path()
 
 
 def validate_shacl(
