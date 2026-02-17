@@ -32,6 +32,37 @@ if TYPE_CHECKING:
 console = Console()
 
 
+def find_git_root(start_path: Path) -> Path | None:
+    """Find the git repository root starting from a given path."""
+    current = start_path.resolve()
+    while current != current.parent:
+        if (current / ".git").exists():
+            return current
+        current = current.parent
+    return None
+
+
+def auto_detect_source_root(strictdoc_path: Path) -> Path | None:
+    """
+    Auto-detect source root from strictdoc path.
+
+    Strategy:
+    1. Try to find git root (most reliable)
+    2. Fall back to parent of strictdoc directory
+    """
+    # Try git root first
+    git_root = find_git_root(strictdoc_path)
+    if git_root:
+        return git_root
+
+    # Fall back to parent directory (assuming docs/strictdoc structure)
+    parent = strictdoc_path.parent
+    if parent.exists() and parent != strictdoc_path:
+        return parent
+
+    return None
+
+
 def setup_logging(verbose: bool = False) -> None:
     """Configure logging with Rich handler."""
     level = logging.DEBUG if verbose else logging.INFO
@@ -75,7 +106,7 @@ def main(ctx: click.Context, verbose: bool) -> None:
     "-s",
     "--source-root",
     type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    help="Root directory for source code scanning",
+    help="Root directory for source code scanning (auto-detected from git root if not specified)",
 )
 @click.option(
     "--prefix",
@@ -134,13 +165,29 @@ def generate(
         )
     )
 
+    # Auto-detect source root if not provided and source scanning is enabled
+    effective_source_root = source_root
+    source_root_auto = False
+    if source_root is None and not no_source_scan:
+        effective_source_root = auto_detect_source_root(strictdoc_export)
+        if effective_source_root:
+            source_root_auto = True
+            console.print(
+                f"[dim]Auto-detected source root: {effective_source_root}[/]"
+            )
+
     # Show configuration
     config_table = Table(title="Configuration", show_header=False)
     config_table.add_column("Setting", style="cyan")
     config_table.add_column("Value")
     config_table.add_row("StrictDoc Source", str(strictdoc_export))
     config_table.add_row("Output", str(output))
-    config_table.add_row("Source Root", str(source_root) if source_root else "None")
+    source_root_display = (
+        f"{effective_source_root} (auto)" if source_root_auto
+        else str(effective_source_root) if effective_source_root
+        else "None (use --source-root to enable)"
+    )
+    config_table.add_row("Source Root", source_root_display)
     config_table.add_row("SPDX ID Prefix", prefix)
     config_table.add_row("Document Name", name)
     config_table.add_row("Organization", org or "None")
@@ -154,7 +201,7 @@ def generate(
         result = generate_design_sbom(
             strictdoc_export_path=strictdoc_export,
             output_path=output,
-            source_root=source_root,
+            source_root=effective_source_root,
             spdx_id_prefix=prefix,
             document_name=name,
             organization=org,
