@@ -49,6 +49,9 @@ strict = true
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore:pkg_resources is deprecated as an API:DeprecationWarning:textx\\.registration",
+]
 
 [dependency-groups]
 dev = [

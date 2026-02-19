@@ -63,6 +63,21 @@ class TestSourceScanner:
         assert len(links) > 0
         assert "SSR-001" in links
 
+    def test_multi_uid_marker(self, fixtures_dir: Path) -> None:
+        """Test a single @sdoc marker that lists multiple UIDs."""
+        source_dir = fixtures_dir / "source"
+        scanner = SourceScanner(source_dir)
+        links = scanner.scan()
+
+        assert any(
+            link.file_path.name == "cam_service.c" and link.line_start == 24
+            for link in links.get("SSR-001", [])
+        )
+        assert any(
+            link.file_path.name == "cam_service.c" and link.line_start == 24
+            for link in links.get("SSR-002", [])
+        )
+
     def test_to_spdx_range(self, fixtures_dir: Path) -> None:
         """Test RangeLink to SPDX PositionalRange conversion."""
         source_dir = fixtures_dir / "source"

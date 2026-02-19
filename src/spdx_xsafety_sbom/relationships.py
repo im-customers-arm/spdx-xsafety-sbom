@@ -11,6 +11,7 @@ This module builds SPDX relationships between elements:
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from spdx_xsafety_sbom.constants import RELATIONSHIP_TYPES
@@ -232,21 +233,27 @@ class RelationshipBuilder:
         """
         relationships: list[dict[str, Any]] = []
 
+        source_root_path = Path(source_root) if source_root else None
+
         for uid, links in source_links.items():
             req_spdx_id = self.spdx_builder.make_spdx_id("element", uid)
 
             for link in links:
-                # Build file element with range
-                file_element = self.spdx_builder.build_file_with_range(
-                    link, source_root
+                # Build canonical file element for cross-SBOM matching
+                file_element = self.spdx_builder.build_file_element(
+                    link.file_path, source_root_path
                 )
                 file_spdx_id = file_element["spdxId"]
+                file_name = file_element.get("name", link.file_path.name)
 
                 rel = self.build_relationship(
                     from_id=req_spdx_id,
                     to_ids=[file_spdx_id],
                     relationship_type="testedOn",
-                    comment=f"{uid} implemented in {link.file_path.name}:{link.line_start}-{link.line_end}",
+                    comment=(
+                        f"{uid} implemented in {file_name}:"
+                        f"{link.line_start}-{link.line_end}"
+                    ),
                 )
                 relationships.append(rel)
 

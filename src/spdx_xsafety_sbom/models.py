@@ -15,7 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 if TYPE_CHECKING:
     pass
@@ -194,8 +194,7 @@ class GeneratorConfig(BaseModel):
         description="Directories to exclude from scanning",
     )
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 # =============================================================================
@@ -214,8 +213,7 @@ class SPDXElement(BaseModel):
     primaryPurpose: str | None = None
     extension: list[dict[str, Any]] = Field(default_factory=list)
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class SPDXRelationship(BaseModel):
@@ -228,8 +226,7 @@ class SPDXRelationship(BaseModel):
     to: list[str]
     comment: str | None = None
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class SPDXDocument(BaseModel):
@@ -244,8 +241,7 @@ class SPDXDocument(BaseModel):
     rootElement: list[str] = Field(default_factory=list)
     element: list[str] = Field(default_factory=list)
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 # =============================================================================
@@ -262,8 +258,7 @@ class XSafetyHazardExtension(BaseModel):
     controllability: str | None = Field(None, alias="xSafety:controllability")
     safetyIntegrityLevel: str | None = Field(None, alias="xSafety:safetyIntegrityLevel")
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class XSafetyRequirementExtension(BaseModel):
@@ -273,8 +268,7 @@ class XSafetyRequirementExtension(BaseModel):
     requirementType: str = Field(..., alias="xSafety:requirementType")
     safetyIntegrityLevel: str | None = Field(None, alias="xSafety:safetyIntegrityLevel")
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 # =============================================================================

@@ -420,27 +420,29 @@ class SPDX3Builder:
         Returns:
             SPDX software_File element.
         """
+        relative_path = file_path
         if source_root:
             try:
                 relative_path = file_path.relative_to(source_root)
             except ValueError:
                 relative_path = file_path
-        else:
-            relative_path = file_path
 
-        # Use relative path as identifier
-        file_id = str(relative_path).replace("\\", "/")
-        spdx_id = self.make_spdx_id("file", file_id)
+        file_name = str(relative_path).replace("\\", "/")
+        if not Path(file_name).is_absolute() and not file_name.startswith("./"):
+            file_name = f"./{file_name}"
+
+        # Use stable path-based identifier for cross-SBOM matching
+        spdx_id = self.make_spdx_id("file", file_name)
 
         # Check if already added
         if spdx_id in self._element_ids:
-            return {"spdxId": spdx_id}
+            return {"spdxId": spdx_id, "name": file_name}
 
         element = {
             "@type": "software_File",
             "spdxId": spdx_id,
-            "name": file_path.name,
-            "description": f"Source file: {relative_path}",
+            "name": file_name,
+            "description": f"Source file: {file_name}",
             "primaryPurpose": "source",
         }
 
@@ -462,24 +464,25 @@ class SPDX3Builder:
         Returns:
             SPDX software_File element with contentInformationType.
         """
+        relative_path = range_link.file_path
         if source_root:
             try:
                 relative_path = range_link.file_path.relative_to(source_root)
             except ValueError:
                 relative_path = range_link.file_path
-        else:
-            relative_path = range_link.file_path
 
-        # Create unique ID including line range
-        file_id = f"{relative_path}#L{range_link.line_start}-L{range_link.line_end}"
-        file_id = file_id.replace("\\", "/")
-        spdx_id = self.make_spdx_id("file", file_id)
+        file_name = str(relative_path).replace("\\", "/")
+        if not Path(file_name).is_absolute() and not file_name.startswith("./"):
+            file_name = f"./{file_name}"
+
+        # Use stable path-based identifier for cross-SBOM matching
+        spdx_id = self.make_spdx_id("file", file_name)
 
         element = {
             "@type": "software_File",
             "spdxId": spdx_id,
-            "name": range_link.file_path.name,
-            "description": f"Source: {relative_path} lines {range_link.line_start}-{range_link.line_end}",
+            "name": file_name,
+            "description": f"Source: {file_name} lines {range_link.line_start}-{range_link.line_end}",
             "primaryPurpose": "source",
             "contentInformationType": [
                 {

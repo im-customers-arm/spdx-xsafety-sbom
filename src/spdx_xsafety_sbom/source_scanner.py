@@ -23,8 +23,8 @@ from spdx_xsafety_sbom.models import RangeLink
 
 logger = logging.getLogger(__name__)
 
-# Regex pattern for @sdoc[UID] markers
-SDOC_MARKER_PATTERN = re.compile(r"@sdoc\[([A-Z]+-\d+(?:\.\d+)*)\]")
+# Regex pattern for @sdoc[...] markers (supports multiple UIDs, closing tags)
+SDOC_MARKER_PATTERN = re.compile(r"@sdoc\[([^\]]+)\]")
 
 
 class SourceScanner:
@@ -123,7 +123,12 @@ class SourceScanner:
             # Find all @sdoc markers on this line
             matches = SDOC_MARKER_PATTERN.findall(line)
 
-            for uid in matches:
+            for match in matches:
+                raw_uids = [part.strip() for part in match.split(",")]
+                uids = [uid.lstrip("/") for uid in raw_uids if uid.strip()]
+                if not uids:
+                    continue
+
                 # Determine the range (marker line + following code block)
                 line_end = self._find_block_end(lines, line_num - 1)
 
@@ -131,21 +136,22 @@ class SourceScanner:
                 snippet_lines = lines[line_num - 1 : min(line_end, line_num + 4)]
                 snippet = "".join(snippet_lines).strip()
 
-                link = RangeLink(
-                    file_path=file_path,
-                    line_start=line_num,
-                    line_end=line_end,
-                    uid=uid,
-                    snippet=snippet[:500] if len(snippet) > 500 else snippet,
-                )
-                links.append(link)
-                logger.debug(
-                    "Found @sdoc[%s] at %s:%d-%d",
-                    uid,
-                    file_path.name,
-                    line_num,
-                    line_end,
-                )
+                for uid in uids:
+                    link = RangeLink(
+                        file_path=file_path,
+                        line_start=line_num,
+                        line_end=line_end,
+                        uid=uid,
+                        snippet=snippet[:500] if len(snippet) > 500 else snippet,
+                    )
+                    links.append(link)
+                    logger.debug(
+                        "Found @sdoc[%s] at %s:%d-%d",
+                        uid,
+                        file_path.name,
+                        line_num,
+                        line_end,
+                    )
 
         return links
 
