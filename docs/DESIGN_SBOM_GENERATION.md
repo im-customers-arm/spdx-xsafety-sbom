@@ -238,9 +238,9 @@ spdx-xsafety-sbom generate /path/to/cam/docs/strictdoc \
 from spdx_xsafety_sbom import generate_design_sbom
 
 generate_design_sbom(
-    strictdoc_dir="/path/to/strictdoc",
-    source_root="/path/to/source",
+    strictdoc_export_path="/path/to/strictdoc",
     output_path="design-sbom.json",
+    source_root="/path/to/source",
     document_name="my-project-sbom",
     spdx_id_prefix="urn:spdx:myorg:",
 )
@@ -299,6 +299,7 @@ src/spdx_xsafety_sbom/
 ├── constants.py          # SPDX/xSafety vocabularies
 ├── generator.py          # Main orchestration
 ├── models.py             # Data classes (StrictDocNode, RangeLink)
+├── paths.py              # Path utilities (frozen/dev, SHACL shapes)
 ├── relationships.py      # SPDX relationship builder
 ├── source_scanner.py     # @sdoc marker scanner
 ├── spdx_builder.py       # SPDX element builder

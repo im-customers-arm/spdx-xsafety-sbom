@@ -72,19 +72,7 @@ uv sync
 uv sync --extra validation
 ```
 
-### Install with Native StrictDoc Parsing (Recommended)
-
-When installed with the `strictdoc` extra, the tool uses StrictDoc's native library
-for parsing `.sdoc` files directly, eliminating the need for JSON export:
-
-```bash
-uv sync --extra strictdoc
-```
-
-This enables:
-- **Native `.sdoc` parsing** using StrictDoc's `SDReader` (tree-sitter based)
-- **Native source traceability** using StrictDoc's `SourceFileTraceabilityReader`
-- Automatic fallback to JSON/regex parsing when StrictDoc is not installed
+StrictDoc is a core dependency; native `.sdoc` parsing is always available.
 
 ### Install All Extras (Development)
 
@@ -96,26 +84,19 @@ uv sync --extra all
 
 ### Generate Design SBOM
 
-From StrictDoc JSON export (default):
+Point to the StrictDoc directory (containing `.sdoc` files). Source root is optional and can be auto-detected from the git root:
 
 ```bash
-uv run spdx-xsafety-sbom generate \
-    --source-root /path/to/project \
-    --strictdoc-dir /path/to/strictdoc-json \
-    --output design-sbom.json
+uv run spdx-xsafety-sbom generate /path/to/strictdoc -o design-sbom.json
 ```
 
-From native `.sdoc` files (when installed with `strictdoc` extra):
+With explicit source root for `@sdoc` marker scanning:
 
 ```bash
-uv run spdx-xsafety-sbom generate \
-    --source-root /path/to/project \
-    --strictdoc-dir /path/to/strictdoc-docs \
-    --output design-sbom.json
+uv run spdx-xsafety-sbom generate /path/to/strictdoc -s /path/to/project -o design-sbom.json
 ```
 
-The tool automatically detects whether to use native parsing (for `.sdoc` files)
-or JSON parsing based on the file types found in the directory.
+The tool uses hybrid parsing: native `.sdoc` parsing by default, with JSON fallback when custom grammars (`.sgra` or `strictdoc.toml`) are detected.
 
 ### Validate Existing SBOM
 
@@ -126,9 +107,10 @@ uv run spdx-xsafety-sbom validate design-sbom.json
 ### With SHACL Validation
 
 ```bash
-uv run spdx-xsafety-sbom validate design-sbom.json \
-    --shacl-shapes spdx_extensions/shacl/safety-shapes.ttl
+uv run spdx-xsafety-sbom validate design-sbom.json --shacl
 ```
+
+Requires `uv sync --extra validation` (pyshacl, rdflib). SHACL shapes are loaded from `spdx_extensions/shacl/safety-shapes.ttl`.
 
 ## Output Format
 
@@ -167,21 +149,28 @@ The generated SBOM is in **JSON-LD** format with SPDX 3.0.1 structure:
 spdx-xsafety-sbom/
 ├── pyproject.toml              # UV-compatible project configuration
 ├── uv.lock                     # UV lock file (auto-generated)
+├── ruff.toml                   # Ruff lint/format configuration
 ├── README.md
 ├── AGENTS.md                   # Agent instructions (UV-only)
 ├── src/
 │   └── spdx_xsafety_sbom/      # Main package
 │       ├── __init__.py
 │       ├── cli.py              # CLI entry point (click-based)
+│       ├── constants.py        # SPDX/xSafety vocabularies
 │       ├── generator.py        # Main SBOM generation logic
-│       ├── strictdoc_parser.py # StrictDoc parsing (native + JSON fallback)
+│       ├── models.py           # Data classes (StrictDocNode, RangeLink)
+│       ├── paths.py            # Path utilities (frozen/dev)
+│       ├── relationships.py    # Relationship type mapping
 │       ├── source_scanner.py   # @sdoc marker scanning (native + regex)
 │       ├── spdx_builder.py     # SPDX 3.0.1 element construction
-│       ├── relationships.py    # Relationship type mapping
+│       ├── strictdoc_parser.py # StrictDoc parsing (native + JSON fallback)
 │       └── validation/
 │           ├── __init__.py
 │           ├── spdx_validator.py   # SPDX JSON-LD validation
 │           └── shacl_validator.py  # SHACL shape validation
+├── scripts/
+│   ├── build_executable.py     # PyInstaller build script
+│   └── spdx-xsafety-sbom.spec  # PyInstaller spec
 ├── spdx_extensions/            # xSafety extension specs (from spdx_diff)
 │   ├── specs/
 │   │   └── safety-profile.md
@@ -193,8 +182,15 @@ spdx-xsafety-sbom/
     ├── __init__.py
     ├── conftest.py
     ├── test_generator.py
+    ├── test_source_scanner.py
+    ├── test_spdx_builder.py
+    ├── test_strictdoc_parser.py
+    ├── test_validator.py
     └── fixtures/
-        └── sample_strictdoc/
+        ├── sample-sbom.json
+        ├── sdoc/               # .sdoc fixtures
+        ├── source/             # Source file fixtures
+        └── strictdoc-export/   # JSON export fixtures
 ```
 
 ## Development
@@ -212,6 +208,8 @@ uv run pytest --cov=spdx_xsafety_sbom --cov-report=html
 ```
 
 ### Linting and Formatting
+
+Ruff uses `ruff.toml` at project root when present. Otherwise `pyproject.toml` [tool.ruff] applies:
 
 ```bash
 uv run ruff check spdx_xsafety_sbom/

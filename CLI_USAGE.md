@@ -43,6 +43,16 @@ Validate an existing SBOM file:
 uv run spdx-xsafety-sbom validate <SBOM_FILE>
 ```
 
+To run SHACL shape validation in addition to structure checks:
+```bash
+uv run spdx-xsafety-sbom validate <SBOM_FILE> --shacl
+```
+
+Install validation extras first:
+```bash
+uv sync --extra validation
+```
+
 ## Help
 
 Show all options:
