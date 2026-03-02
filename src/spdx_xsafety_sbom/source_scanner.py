@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Iterator
 from pathlib import Path
 
 from spdx_xsafety_sbom.constants import SCANNABLE_EXTENSIONS
@@ -90,7 +91,7 @@ class SourceScanner:
 
         return links
 
-    def _iter_source_files(self):
+    def _iter_source_files(self) -> Iterator[Path]:
         """Iterate over scannable source files."""
         for ext in self.extensions:
             pattern = f"**/*{ext}"

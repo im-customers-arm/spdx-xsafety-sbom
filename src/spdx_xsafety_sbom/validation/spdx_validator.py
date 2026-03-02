@@ -131,15 +131,18 @@ def validate_structure(document: dict[str, Any]) -> ValidationResult:
     # Check @graph
     if "@graph" not in document:
         result.errors.append("Missing @graph")
+        result.valid = False
         return result
 
     graph = document["@graph"]
     if not isinstance(graph, list):
         result.errors.append("@graph must be an array")
+        result.valid = False
         return result
 
     if not graph:
         result.errors.append("@graph is empty")
+        result.valid = False
         return result
 
     # Collect elements and validate
@@ -189,6 +192,9 @@ def validate_structure(document: dict[str, Any]) -> ValidationResult:
     result.info["element_count"] = len(elements)
     result.info["relationship_count"] = len(relationships)
     result.info["spdx_documents"] = len(spdx_documents)
+
+    if result.errors:
+        result.valid = False
 
     return result
 

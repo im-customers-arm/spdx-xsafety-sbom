@@ -7,8 +7,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 from spdx_xsafety_sbom.generator import generate_design_sbom
 
 

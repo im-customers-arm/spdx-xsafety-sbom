@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from spdx_xsafety_sbom import __version__
 from spdx_xsafety_sbom.models import GenerationResult, GeneratorConfig
 from spdx_xsafety_sbom.relationships import RelationshipBuilder
 from spdx_xsafety_sbom.source_scanner import SourceScanner
@@ -111,7 +112,7 @@ def generate_design_sbom(
         # Build creation info
         builder.build_creation_info(
             tool_name=tool_name,
-            tool_version="0.1.0",
+            tool_version=__version__,
             organization=organization,
         )
 

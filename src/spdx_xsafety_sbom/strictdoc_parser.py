@@ -26,13 +26,13 @@ logger = logging.getLogger(__name__)
 
 # StrictDoc library is required
 try:
-    from strictdoc.backend.sdoc.reader import SDReader
+    from strictdoc.backend.sdoc.reader import SDReader  # type: ignore[import-untyped]
 
     _STRICTDOC_AVAILABLE = True
-    
+
     # Import TextX exceptions for better error handling
     try:
-        from textx.exceptions import TextXSyntaxError
+        from textx.exceptions import TextXSyntaxError  # type: ignore[import-untyped]
         _TEXTX_AVAILABLE = True
     except ImportError:
         _TEXTX_AVAILABLE = False
@@ -87,21 +87,21 @@ class StrictDocParser:
             Formatted error message with guidance.
         """
         error_msg = str(error)
-        
+
         # Extract line and column info if available
         import re
         line_match = re.search(r":(\d+):(\d+):", error_msg)
         if line_match:
             line_num = int(line_match.group(1))
             col_num = int(line_match.group(2))
-            
+
             # Try to show the problematic line
             try:
                 with open(file_path, encoding="utf-8") as f:
                     lines = f.readlines()
                     if 0 <= line_num - 1 < len(lines):
                         problem_line = lines[line_num - 1].rstrip()
-                        
+
                         msg_parts = [
                             f"\n{'='*70}",
                             f"StrictDoc Syntax Error in: {file_path}",
@@ -127,7 +127,7 @@ class StrictDocParser:
                         return "\n".join(msg_parts)
             except Exception:
                 pass  # Fall through to basic message
-        
+
         # Fallback message
         return (
             f"\nStrictDoc parsing error in {file_path}:\n"
@@ -152,12 +152,16 @@ class StrictDocParser:
         if not self.path.exists():
             raise FileNotFoundError(f"StrictDoc path not found: {self.path}")
 
+        # Reset state for idempotent parsing
+        self._nodes = {}
+        self._documents = []
+
         if self.path.is_file():
             if self.path.suffix == ".sdoc":
                 # Check if parent directory has custom grammars
                 parent_dir = self.path.parent
                 sgra_files = list(parent_dir.glob("**/*.sgra"))
-                
+
                 if sgra_files:
                     # Custom grammars detected - must use export-based parsing
                     # Parse the entire parent directory instead of just this file
@@ -204,7 +208,7 @@ class StrictDocParser:
                         error_msg += "  (directory is empty)"
                 except Exception:
                     error_msg += "  (unable to list files)"
-                
+
                 logger.warning(error_msg)
                 return {}
 
@@ -266,14 +270,14 @@ class StrictDocParser:
                     venv_strictdoc = Path(sys.prefix) / "Scripts" / "strictdoc.exe"
                 else:  # Linux/Mac
                     venv_strictdoc = Path(sys.prefix) / "bin" / "strictdoc"
-                
+
                 if venv_strictdoc.exists():
                     strictdoc_cmd = str(venv_strictdoc)
-            
+
             # Fallback to shutil.which
             if not strictdoc_cmd:
                 strictdoc_cmd = shutil.which("strictdoc")
-            
+
             if not strictdoc_cmd:
                 raise RuntimeError(
                     "StrictDoc CLI not found. Install with: uv add strictdoc"
@@ -305,7 +309,7 @@ class StrictDocParser:
 
                 if result.returncode != 0:
                     error_output = result.stderr or result.stdout or "Unknown error"
-                    
+
                     # Check for common error patterns
                     if "TextXSyntaxError" in error_output:
                         error_msg = (
@@ -355,7 +359,7 @@ class StrictDocParser:
                             f"  cd {self.path}\n"
                             f"  uv run strictdoc --debug export .\n"
                         )
-                    
+
                     logger.error(error_msg)
                     raise RuntimeError(error_msg)
 
@@ -379,7 +383,7 @@ class StrictDocParser:
             # Parse the JSON structure
             self._parse_json_export(data)
 
-    def _parse_json_export(self, data: dict) -> None:
+    def _parse_json_export(self, data: dict[str, Any]) -> None:
         """
         Parse the JSON export from StrictDoc.
 
@@ -391,13 +395,13 @@ class StrictDocParser:
             doc_title = doc.get("TITLE", "Unknown")
             self._parse_json_document(doc, doc_title)
 
-    def _parse_json_document(self, doc: dict, doc_title: str) -> None:
+    def _parse_json_document(self, doc: dict[str, Any], doc_title: str) -> None:
         """Parse a single document from JSON export."""
         # Parse NODES (flat list of all nodes)
         nodes = doc.get("NODES", [])
         self._walk_json_nodes(nodes, doc_title)
 
-    def _walk_json_nodes(self, nodes: list, doc_title: str) -> None:
+    def _walk_json_nodes(self, nodes: list[dict[str, Any]], doc_title: str) -> None:
         """Recursively walk through JSON nodes."""
         for node in nodes:
             node_type = node.get("NODE_TYPE", "")
@@ -420,7 +424,7 @@ class StrictDocParser:
             if children:
                 self._walk_json_nodes(children, doc_title)
 
-    def _parse_json_node(self, node: dict) -> None:
+    def _parse_json_node(self, node: dict[str, Any]) -> None:
         """Parse a single node from JSON export."""
         uid = node.get("UID")
         if not uid or uid in self._nodes:
@@ -471,7 +475,7 @@ class StrictDocParser:
             parent_uids,
         )
 
-    def _extract_json_parent_uids(self, node: dict) -> list[str]:
+    def _extract_json_parent_uids(self, node: dict[str, Any]) -> list[str]:
         """Extract parent UIDs from JSON node relations."""
         parent_uids: list[str] = []
         relations = node.get("RELATIONS", [])
@@ -495,7 +499,7 @@ class StrictDocParser:
 
         StrictDoc's SDReader doesn't resolve IMPORT_FROM_FILE directives,
         so we need to inline the grammar content before parsing.
-        
+
         Note: Custom grammars (.sgra files) are better handled by the
         export-based parsing approach. This method is for simple cases only.
 
@@ -515,7 +519,7 @@ class StrictDocParser:
         if match:
             grammar_filename = match.group(1)
             grammar_path = base_path / grammar_filename
-            
+
             # If the grammar file exists and is a .sgra (custom grammar),
             # raise an error indicating export-based parsing is needed
             if grammar_path.exists() and grammar_path.suffix == ".sgra":
@@ -534,7 +538,7 @@ class StrictDocParser:
                     f"when validating a directory containing .sgra files.\n"
                     f"{'='*70}\n"
                 )
-            
+
             # For non-custom grammars, inline them
             if grammar_path.exists():
                 with open(grammar_path, encoding="utf-8") as f:

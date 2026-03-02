@@ -148,7 +148,7 @@ jobs:
       - name: Generate test SBOM
         run: |
           uv run spdx-xsafety-sbom generate \
-            tests/fixtures/strictdoc-export \
+            tests/fixtures/sdoc \
             -o test-output.json \
             --no-source-scan
 

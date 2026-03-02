@@ -20,10 +20,10 @@ def get_bundle_dir() -> Path:
     """
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
         # Running from PyInstaller bundle
-        return Path(sys._MEIPASS)  # type: ignore[attr-defined]
+        return Path(sys._MEIPASS)
     else:
         # Running from source - go up from src/spdx_xsafety_sbom/
-        return Path(__file__).parent.parent.parent.parent
+        return Path(__file__).resolve().parent.parent.parent
 
 
 def get_spdx_extensions_dir() -> Path:

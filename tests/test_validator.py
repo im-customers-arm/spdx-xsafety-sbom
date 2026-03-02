@@ -4,11 +4,8 @@ Tests for SPDX validator.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
-
-import pytest
 
 from spdx_xsafety_sbom.validation import validate_sbom, validate_structure
 

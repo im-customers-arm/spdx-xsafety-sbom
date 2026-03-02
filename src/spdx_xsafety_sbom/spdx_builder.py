@@ -159,7 +159,7 @@ class SPDX3Builder:
             "creationInfo": self._creation_info,
             "namespaceMap": namespace_map,
             "rootElement": root_elements or [],
-            "element": list(self._element_ids - {doc_id}),
+            "element": sorted(self._element_ids - {doc_id}),
         }
 
         # Build complete JSON-LD document
@@ -183,8 +183,8 @@ class SPDX3Builder:
         Returns:
             SPDX ID of the element.
         """
-        spdx_id = element.get("spdxId")
-        if spdx_id and spdx_id not in self._element_ids:
+        spdx_id: str = element["spdxId"]
+        if spdx_id not in self._element_ids:
             self._elements.append(element)
             self._element_ids.add(spdx_id)
         return spdx_id

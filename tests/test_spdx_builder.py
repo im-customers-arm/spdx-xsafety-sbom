@@ -4,8 +4,6 @@ Tests for SPDX 3.0.1 builder.
 
 from __future__ import annotations
 
-import pytest
-
 from spdx_xsafety_sbom.models import StrictDocNode
 from spdx_xsafety_sbom.spdx_builder import SPDX3Builder
 

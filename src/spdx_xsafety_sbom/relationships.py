@@ -37,6 +37,12 @@ class RelationshipBuilder:
         self._relationships: list[dict[str, Any]] = []
         self._relationship_count = 0
 
+    def _spdx_id_for_node(self, uid: str, nodes: dict[str, StrictDocNode]) -> str:
+        """Get the correct SPDX ID for a node based on its type."""
+        node = nodes[uid]
+        prefix = "evidence" if node.get_requirement_type() == "EVID" else "element"
+        return self.spdx_builder.make_spdx_id(prefix, uid)
+
     def build_relationship(
         self,
         from_id: str,
@@ -104,14 +110,14 @@ class RelationshipBuilder:
                 continue
 
             # Build descendantOf relationship for each parent
-            child_spdx_id = self.spdx_builder.make_spdx_id("element", uid)
+            child_spdx_id = self._spdx_id_for_node(uid, nodes)
 
             for parent_uid in node.parent_uids:
                 if parent_uid not in nodes:
                     logger.warning("Parent UID %s not found for %s", parent_uid, uid)
                     continue
 
-                parent_spdx_id = self.spdx_builder.make_spdx_id("element", parent_uid)
+                parent_spdx_id = self._spdx_id_for_node(parent_uid, nodes)
 
                 rel = self.build_relationship(
                     from_id=child_spdx_id,
