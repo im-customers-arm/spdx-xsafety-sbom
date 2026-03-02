@@ -41,14 +41,14 @@ def generate_design_sbom(
     Generate an SPDX 3.0.1 Design SBOM with xSafety extensions.
 
     This is the main entry point for SBOM generation. It:
-    1. Parses StrictDoc JSON export for requirements
+    1. Parses StrictDoc sources for requirements
     2. Optionally scans source files for @sdoc markers
     3. Builds SPDX 3.0.1 elements with xSafety extensions
     4. Builds relationships (descendantOf, hasTestCase, testedOn, etc.)
     5. Writes JSON-LD output
 
     Args:
-        strictdoc_export_path: Path to StrictDoc JSON export directory.
+        strictdoc_export_path: Path to StrictDoc directory or .sdoc file.
         output_path: Path for output SBOM file.
         source_root: Optional root path for source code scanning.
         spdx_id_prefix: Prefix for SPDX element IDs.
@@ -71,20 +71,20 @@ def generate_design_sbom(
         src_root = Path(source_root) if source_root else None
 
         logger.info("Starting SBOM generation")
-        logger.info("  StrictDoc export: %s", export_path)
+        logger.info("  StrictDoc source path: %s", export_path)
         logger.info("  Output: %s", out_path)
         if src_root:
             logger.info("  Source root: %s", src_root)
 
         # =================================================================
-        # Step 1: Parse StrictDoc export
+        # Step 1: Parse StrictDoc source content
         # =================================================================
-        logger.info("Parsing StrictDoc export...")
+        logger.info("Parsing StrictDoc sources...")
         parser = StrictDocParser(export_path)
         nodes = parser.parse()
 
         if not nodes:
-            result.errors.append("No requirements found in StrictDoc export")
+            result.errors.append("No requirements found in StrictDoc sources")
             return result
 
         logger.info("Found %d requirements", len(nodes))

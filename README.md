@@ -21,14 +21,13 @@ Unlike traditional SBOMs that document software packages and dependencies, a **D
 - Test Cases
 - Evidence artifacts
 
-### xSafety Extension Classes
+### xSafety Extension Classes Used by This Tool
 
 | Class | Description |
 |-------|-------------|
 | `HazardExtension` | ISO 26262 HARA: severity, exposure, controllability, ASIL |
 | `SafetyGoalExtension` | Safety goals with ASIL classification |
 | `SafetyRequirementExtension` | TSR/SSR with requirement type |
-| `SafetyExtension` | General safety classification |
 | `SafetyTestExtension` | Test documentation |
 | `SafetyEvidenceExtension` | Evidence artifacts |
 
@@ -96,7 +95,7 @@ With explicit source root for `@sdoc` marker scanning:
 uv run spdx-xsafety-sbom generate /path/to/strictdoc -s /path/to/project -o design-sbom.json
 ```
 
-The tool uses hybrid parsing: native `.sdoc` parsing by default, with JSON fallback when custom grammars (`.sgra` or `strictdoc.toml`) are detected.
+The tool uses hybrid parsing: native `.sdoc` parsing by default, with JSON fallback when custom grammar files (`.sgra`) are detected.
 
 ### Validate Existing SBOM
 
@@ -125,14 +124,14 @@ The generated SBOM is in **JSON-LD** format with SPDX 3.0.1 structure:
   "@graph": [
     {
       "@type": "SpdxDocument",
-      "spdxId": "urn:spdx:cam:document",
-      "name": "Design SBOM",
+      "spdxId": "urn:spdx:cam:document-design-sbom",
+      "name": "design-sbom",
       ...
     },
     {
       "@type": "Bundle",
-      "spdxId": "urn:spdx:cam:SSR-001",
-      "name": "[SSR] Software Safety Requirement",
+      "spdxId": "urn:spdx:cam:element-SSR-001",
+      "name": "SSR-001",
       "extension": [{
         "type": "xSafety:SafetyRequirementExtension",
         "xSafety:requirementType": "softwareSafetyRequirement",
@@ -149,9 +148,9 @@ The generated SBOM is in **JSON-LD** format with SPDX 3.0.1 structure:
 spdx-xsafety-sbom/
 ├── pyproject.toml              # UV-compatible project configuration
 ├── uv.lock                     # UV lock file (auto-generated)
-├── ruff.toml                   # Ruff lint/format configuration
 ├── README.md
 ├── AGENTS.md                   # Agent instructions (UV-only)
+├── .github/workflows/          # CI and release automation
 ├── src/
 │   └── spdx_xsafety_sbom/      # Main package
 │       ├── __init__.py
@@ -161,7 +160,7 @@ spdx-xsafety-sbom/
 │       ├── models.py           # Data classes (StrictDocNode, RangeLink)
 │       ├── paths.py            # Path utilities (frozen/dev)
 │       ├── relationships.py    # Relationship type mapping
-│       ├── source_scanner.py   # @sdoc marker scanning (native + regex)
+│       ├── source_scanner.py   # @sdoc marker scanning (regex-based)
 │       ├── spdx_builder.py     # SPDX 3.0.1 element construction
 │       ├── strictdoc_parser.py # StrictDoc parsing (native + JSON fallback)
 │       └── validation/
@@ -179,7 +178,6 @@ spdx-xsafety-sbom/
 │   └── shacl/
 │       └── safety-shapes.ttl
 └── tests/
-    ├── __init__.py
     ├── conftest.py
     ├── test_generator.py
     ├── test_source_scanner.py
@@ -189,8 +187,7 @@ spdx-xsafety-sbom/
     └── fixtures/
         ├── sample-sbom.json
         ├── sdoc/               # .sdoc fixtures
-        ├── source/             # Source file fixtures
-        └── strictdoc-export/   # JSON export fixtures
+        └── source/             # Source file fixtures
 ```
 
 ## Development
@@ -209,17 +206,17 @@ uv run pytest --cov=spdx_xsafety_sbom --cov-report=html
 
 ### Linting and Formatting
 
-Ruff uses `ruff.toml` at project root when present. Otherwise `pyproject.toml` [tool.ruff] applies:
+Ruff configuration is defined in `pyproject.toml`:
 
 ```bash
-uv run ruff check spdx_xsafety_sbom/
-uv run ruff format spdx_xsafety_sbom/
+uv run ruff check src/ tests/
+uv run ruff format src/ tests/
 ```
 
 ### Type Checking
 
 ```bash
-uv run mypy spdx_xsafety_sbom/ --strict
+uv run mypy src/ --strict
 ```
 
 ### Building Executables
@@ -270,7 +267,6 @@ The release workflow will automatically:
 | RelationshipType | Description |
 |-----------------|-------------|
 | `descendantOf` | The `from` Element is a descendant of each `to` Element |
-| `hasSpecification` | Every `to` Element is a specification for the `from` Element |
 | `hasTestCase` | Every `to` Element is a test case for the `from` Element |
 | `hasEvidence` | Every `to` Element is considered as evidence for the `from` Element |
 | `testedOn` | The `from` Element has been tested on the `to` Element(s) |

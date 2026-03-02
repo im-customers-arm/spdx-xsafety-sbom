@@ -2,7 +2,7 @@
 Click-based CLI for SPDX xSafety SBOM generator.
 
 Commands:
-- generate: Generate SPDX 3.0.1 Design SBOM from StrictDoc export
+- generate: Generate SPDX 3.0.1 Design SBOM from StrictDoc sources
 - validate: Validate an existing SBOM against SPDX/xSafety schemas
 - version: Display version information
 """
@@ -89,7 +89,7 @@ def main(ctx: click.Context, verbose: bool) -> None:
 
 @main.command()
 @click.argument(
-    "strictdoc_export",
+    "strictdoc_path",
     type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
 )
 @click.option(
@@ -135,7 +135,7 @@ def main(ctx: click.Context, verbose: bool) -> None:
 @click.pass_context
 def generate(
     _ctx: click.Context,
-    strictdoc_export: Path,
+    strictdoc_path: Path,
     output: Path,
     source_root: Path | None,
     prefix: str,
@@ -145,9 +145,9 @@ def generate(
     no_validate: bool,
 ) -> None:
     """
-    Generate an SPDX 3.0.1 Design SBOM from StrictDoc export.
+    Generate an SPDX 3.0.1 Design SBOM from StrictDoc sources.
 
-    STRICTDOC_EXPORT is the path to the StrictDoc directory
+    STRICTDOC_PATH is the path to the StrictDoc directory
     (containing .sdoc files).
 
     Example:
@@ -166,7 +166,7 @@ def generate(
     effective_source_root = source_root
     source_root_auto = False
     if source_root is None and not no_source_scan:
-        effective_source_root = auto_detect_source_root(strictdoc_export)
+        effective_source_root = auto_detect_source_root(strictdoc_path)
         if effective_source_root:
             source_root_auto = True
             console.print(
@@ -177,7 +177,7 @@ def generate(
     config_table = Table(title="Configuration", show_header=False)
     config_table.add_column("Setting", style="cyan")
     config_table.add_column("Value")
-    config_table.add_row("StrictDoc Source", str(strictdoc_export))
+    config_table.add_row("StrictDoc Source", str(strictdoc_path))
     config_table.add_row("Output", str(output))
     source_root_display = (
         f"{effective_source_root} (auto)" if source_root_auto
@@ -196,7 +196,7 @@ def generate(
     # Generate SBOM
     with console.status("[bold green]Generating SBOM..."):
         result = generate_design_sbom(
-            strictdoc_export_path=strictdoc_export,
+            strictdoc_export_path=strictdoc_path,
             output_path=output,
             source_root=effective_source_root,
             spdx_id_prefix=prefix,

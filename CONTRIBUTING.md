@@ -20,8 +20,11 @@ curl -LsSf https://astral.sh/uv/install.sh | sh  # Unix/macOS
 # or
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
 
-# Install dependencies
-uv sync --all-extras
+# Install dependencies for local development
+uv sync --dev
+
+# Optional: include validation extras (pyshacl, rdflib, etc.)
+uv sync --extra validation
 ```
 
 ## Development Workflow
@@ -59,7 +62,7 @@ uv run mypy src/
 uv run spdx-xsafety-sbom --help
 
 # Generate test SBOM
-uv run spdx-xsafety-sbom generate tests/fixtures/strictdoc-export -o test.json
+uv run spdx-xsafety-sbom generate tests/fixtures/sdoc -o test.json --no-source-scan
 ```
 
 ## Pull Request Process
@@ -127,7 +130,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 ## Code Style
 
 ### Python Style
-- Use Ruff for linting and formatting (configured in `ruff.toml`)
+- Use Ruff for linting and formatting (configured in `pyproject.toml`)
 - Follow type hints (checked by mypy)
 - Maximum line length: 100 characters
 - Use meaningful variable names
@@ -194,7 +197,7 @@ def test_feature_description():
 1. Add command function in `src/spdx_xsafety_sbom/cli.py`
 2. Use Click decorators for options/arguments
 3. Use Rich for beautiful output
-4. Add tests in `tests/test_cli.py`
+4. Add tests in `tests/` (e.g., a new `test_cli.py` module)
 5. Update README.md usage section
 
 ### New SPDX Element Type

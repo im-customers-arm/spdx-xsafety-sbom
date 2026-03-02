@@ -75,8 +75,8 @@ These extensions follow SPDX 3.0.1 extension guidelines:
 ### SHACL Validation
 
 ```bash
-# Install pyshacl
-uv add pyshacl
+# Install validation dependencies
+uv sync --extra validation
 
 # Validate a document against safety shapes
 uv run pyshacl -s spdx_extensions/shacl/safety-shapes.ttl \

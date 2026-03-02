@@ -31,7 +31,7 @@ uv run spdx-xsafety-sbom generate "D:/GITHUB/ARM/arm-critical-app-monitoring/doc
 
 ## Other Options
 
-- `--source-root <DIR>`: Root directory for source code scanning (optional)
+- `--source-root <DIR>`: Root directory for source code scanning (optional, auto-detected from git root when omitted)
 - `--prefix <PREFIX>`: Custom SPDX ID prefix (default: `urn:spdx:example:`)
 - `--no-source-scan`: Disable @sdoc marker scanning
 - `--no-validate`: Disable output validation

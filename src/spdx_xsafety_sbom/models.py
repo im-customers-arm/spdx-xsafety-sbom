@@ -150,7 +150,7 @@ class GeneratorConfig(BaseModel):
 
     # Input paths
     strictdoc_export_path: Path = Field(
-        ..., description="Path to StrictDoc JSON export directory"
+        ..., description="Path to StrictDoc directory or .sdoc file"
     )
     source_root: Path | None = Field(
         None, description="Root path for source code scanning"
