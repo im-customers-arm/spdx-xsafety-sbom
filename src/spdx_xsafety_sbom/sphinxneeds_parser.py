@@ -90,13 +90,15 @@ _TYPE_MAP: dict[str, str] = {
     "test":         "TC",
     "need":         "NEED",
     # Safety-specific types used in this project
-    "evidence":     "EVID",
-    "test_case":    "TC",
-    "hazard":       "HAZ",
-    "safety_goal":  "SG",
-    "ssr":          "SSR",
-    "swa":          "SWA",
-    "tsr":          "TSR",
+    "evidence":              "EVID",
+    "test_case":             "TC",
+    "hazard":                "HAZ",
+    "safety_goal":           "SG",
+    "fsc":                   "FSC",   # Functional Safety Concept per ISO 26262
+    "tsc":                   "TSC",   # Technical Safety Concept per ISO 26262
+    "ssr":                   "SSR",
+    "swa":                   "SWA",
+    "tsr":                   "TSR",
 }
 
 _DEFAULT_NODE_TYPE = "REQUIREMENT"

@@ -48,7 +48,7 @@ def auto_detect_source_root(strictdoc_path: Path) -> Path | None:
     2. Fall back to parent of strictdoc directory
     """
     # Try git root first
-    git_root = find_git_root(strictdoc_path)
+    git_root = find_git_root(strictdoc_path if strictdoc_path.is_dir() else strictdoc_path.parent)
     if git_root:
         return git_root
 
@@ -89,8 +89,8 @@ def main(ctx: click.Context, verbose: bool) -> None:
 
 @main.command()
 @click.argument(
-    "strictdoc_path",
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    "input_path",
+    type=click.Path(exists=True, file_okay=True, dir_okay=True, path_type=Path),
 )
 @click.option(
     "-o",
@@ -125,17 +125,25 @@ def main(ctx: click.Context, verbose: bool) -> None:
 @click.option(
     "--no-source-scan",
     is_flag=True,
-    help="Disable @sdoc marker scanning",
+    help="Disable requirement marker scanning",
 )
 @click.option(
     "--no-validate",
     is_flag=True,
     help="Disable output validation",
 )
+@click.option(
+    "--input-format",
+    "input_format",
+    type=click.Choice(["auto", "strictdoc", "sphinx-needs"], case_sensitive=False),
+    default="auto",
+    show_default=True,
+    help="Input format: auto (detect), strictdoc (.sdoc dir), or sphinx-needs (needs.json)",
+)
 @click.pass_context
 def generate(
     _ctx: click.Context,
-    strictdoc_path: Path,
+    input_path: Path,
     output: Path,
     source_root: Path | None,
     prefix: str,
@@ -143,16 +151,19 @@ def generate(
     org: str | None,
     no_source_scan: bool,
     no_validate: bool,
+    input_format: str,
 ) -> None:
     """
-    Generate an SPDX 3.0.1 Design SBOM from StrictDoc sources.
+    Generate an SPDX 3.0.1 Design SBOM from StrictDoc or Sphinx-Needs sources.
 
-    STRICTDOC_PATH is the path to the StrictDoc directory
-    (containing .sdoc files).
+    INPUT_PATH is a StrictDoc directory (containing .sdoc files) or a
+    Sphinx-Needs needs.json file.
 
     Example:
 
         spdx-xsafety-sbom generate ./docs/strictdoc -o design-sbom.json
+
+        spdx-xsafety-sbom generate ./_build/needs/needs.json -o design-sbom.json
 
     """
     console.print(
@@ -166,7 +177,7 @@ def generate(
     effective_source_root = source_root
     source_root_auto = False
     if source_root is None and not no_source_scan:
-        effective_source_root = auto_detect_source_root(strictdoc_path)
+        effective_source_root = auto_detect_source_root(input_path)
         if effective_source_root:
             source_root_auto = True
             console.print(
@@ -177,7 +188,8 @@ def generate(
     config_table = Table(title="Configuration", show_header=False)
     config_table.add_column("Setting", style="cyan")
     config_table.add_column("Value")
-    config_table.add_row("StrictDoc Source", str(strictdoc_path))
+    config_table.add_row("Input Path", str(input_path))
+    config_table.add_row("Input Format", input_format)
     config_table.add_row("Output", str(output))
     source_root_display = (
         f"{effective_source_root} (auto)" if source_root_auto
@@ -196,7 +208,7 @@ def generate(
     # Generate SBOM
     with console.status("[bold green]Generating SBOM..."):
         result = generate_design_sbom(
-            strictdoc_export_path=strictdoc_path,
+            strictdoc_export_path=input_path,
             output_path=output,
             source_root=effective_source_root,
             spdx_id_prefix=prefix,
@@ -204,6 +216,7 @@ def generate(
             organization=org,
             scan_source_markers=not no_source_scan,
             validate_output=not no_validate,
+            input_format=input_format,
         )
 
     # Display result

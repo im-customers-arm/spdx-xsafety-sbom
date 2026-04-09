@@ -91,3 +91,37 @@ class TestSourceScanner:
         assert "beginPointer" in spdx_range
         assert "endPointer" in spdx_range
         assert spdx_range["beginPointer"]["lineNumber"] == link.line_start
+
+    def test_scan_need_marker(self, tmp_path: Path) -> None:
+        """Test scanning source files for @need markers."""
+        source_file = tmp_path / "cam_service_need.c"
+        source_file.write_text(
+            "// @need[SSR-010]\n"
+            "void check_timeout(void) {\n"
+            "    trigger_alarm();\n"
+            "}\n",
+            encoding="utf-8",
+        )
+
+        scanner = SourceScanner(tmp_path)
+        links = scanner.scan()
+
+        assert "SSR-010" in links
+        assert links["SSR-010"][0].file_path == source_file
+
+    def test_scan_need_marker_with_closing_tag_style_uid(self, tmp_path: Path) -> None:
+        """Test @need markers strip a leading slash from UIDs."""
+        source_file = tmp_path / "cam_service_need_close.c"
+        source_file.write_text(
+            "// @need[/SSR-011, SSR-012]\n"
+            "void check_close_style_uid(void) {\n"
+            "    return;\n"
+            "}\n",
+            encoding="utf-8",
+        )
+
+        scanner = SourceScanner(tmp_path)
+        links = scanner.scan()
+
+        assert "SSR-011" in links
+        assert "SSR-012" in links

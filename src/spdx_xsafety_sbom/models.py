@@ -149,8 +149,14 @@ class GeneratorConfig(BaseModel):
     """Configuration for SBOM generation."""
 
     # Input paths
-    strictdoc_export_path: Path = Field(
-        ..., description="Path to StrictDoc directory or .sdoc file"
+    input_path: Path = Field(
+        ...,
+        alias="strictdoc_export_path",
+        description="Path to StrictDoc directory, .sdoc file, or Sphinx-Needs needs.json",
+    )
+    input_format: Literal["auto", "strictdoc", "sphinx-needs"] = Field(
+        "auto",
+        description="Input format: auto-detect, strictdoc (.sdoc), or sphinx-needs (needs.json)",
     )
     source_root: Path | None = Field(
         None, description="Root path for source code scanning"
@@ -180,7 +186,7 @@ class GeneratorConfig(BaseModel):
         True, description="Include source code range links"
     )
     scan_source_markers: bool = Field(
-        True, description="Scan source files for @sdoc markers"
+        True, description="Scan source files for requirement markers (@sdoc, @need)"
     )
     validate_output: bool = Field(True, description="Validate generated SBOM")
 
@@ -194,7 +200,7 @@ class GeneratorConfig(BaseModel):
         description="Directories to exclude from scanning",
     )
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
 
 # =============================================================================

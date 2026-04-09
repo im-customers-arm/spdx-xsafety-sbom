@@ -24,7 +24,10 @@ class TestSphinxNeedsParser:
         assert len(nodes) > 0
         assert "HAZ-001" in nodes
         assert "SG-001" in nodes
+        assert "FSC-001" in nodes
+        assert "TSR-001" in nodes
         assert "SSR-001" in nodes
+        assert "SWA-001" in nodes
 
     def test_parse_hazard_node(self, fixtures_dir: Path) -> None:
         """Test hazard node has expected fields."""
@@ -52,9 +55,17 @@ class TestSphinxNeedsParser:
         assert sg is not None
         assert "HAZ-001" in sg.parent_uids
 
+        fsc = nodes.get("FSC-001")
+        assert fsc is not None
+        assert "SG-001" in fsc.parent_uids
+
+        tsr = nodes.get("TSR-001")
+        assert tsr is not None
+        assert "FSC-001" in tsr.parent_uids
+
         ssr = nodes.get("SSR-001")
         assert ssr is not None
-        assert "SG-001" in ssr.parent_uids
+        assert "TSR-001" in ssr.parent_uids
         assert "TC-001" in ssr.parent_uids
 
     def test_build_child_relationships(self, fixtures_dir: Path) -> None:
@@ -66,6 +77,10 @@ class TestSphinxNeedsParser:
         haz = nodes.get("HAZ-001")
         assert haz is not None
         assert "SG-001" in haz.child_uids
+
+        sg = nodes.get("SG-001")
+        assert sg is not None
+        assert "FSC-001" in sg.child_uids
 
         tc = nodes.get("TC-001")
         assert tc is not None
@@ -93,6 +108,21 @@ class TestSphinxNeedsParser:
         assert ssr is not None
         assert ssr.document_path == Path("safety/ssr_doc")
         assert ssr.file_refs == ["src/cam/service.c", "src/cam/timer.c"]
+
+    def test_docname_resolves_to_rst_fixture(self, fixtures_dir: Path) -> None:
+        """Test parsed docname can be resolved to an .rst file in the fixture tree."""
+        export_path = fixtures_dir / "sphinxneeds" / "needs.json"
+        parser = SphinxNeedsParser(export_path)
+        nodes = parser.parse()
+
+        ssr = nodes.get("SSR-001")
+        assert ssr is not None
+        assert ssr.document_path is not None
+
+        rst_path = export_path.parent / Path(f"{ssr.document_path}.rst")
+        assert rst_path.exists()
+        rst_text = rst_path.read_text(encoding="utf-8")
+        assert ":id: SSR-001" in rst_text
 
     def test_parse_missing_file(self, tmp_path: Path) -> None:
         """Test error handling for missing needs.json file."""
@@ -144,3 +174,118 @@ class TestSphinxNeedsParser:
     def test_infer_node_type_empty_type_uses_default(self) -> None:
         """Test empty type string falls back to default node type."""
         assert SphinxNeedsParser._infer_node_type("", "UNK-001") == "REQUIREMENT"
+
+    def test_parse_empty_needs_dict(self, tmp_path: Path) -> None:
+        """Test parser returns an empty result when the selected version has no needs."""
+        needs_path = tmp_path / "needs.json"
+        needs_path.write_text(
+            json.dumps(
+                {
+                    "current_version": "v1",
+                    "versions": {"v1": {"needs": {}, "needs_schema": {"properties": {}}}},
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        parser = SphinxNeedsParser(needs_path)
+        assert parser.parse() == {}
+
+    def test_parse_duplicate_id_skipped(self, tmp_path: Path) -> None:
+        """Test parser keeps the first node when duplicate need ids appear."""
+        needs_path = tmp_path / "needs.json"
+        needs_path.write_text(
+            json.dumps(
+                {
+                    "current_version": "v1",
+                    "versions": {
+                        "v1": {
+                            "needs": {
+                                "FIRST": {
+                                    "id": "REQ-1",
+                                    "type": "req",
+                                    "title": "First copy",
+                                    "content": "first",
+                                },
+                                "SECOND": {
+                                    "id": "REQ-1",
+                                    "type": "req",
+                                    "title": "Second copy",
+                                    "content": "second",
+                                },
+                            },
+                            "needs_schema": {"properties": {}},
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        parser = SphinxNeedsParser(needs_path)
+        nodes = parser.parse()
+
+        assert list(nodes) == ["REQ-1"]
+        assert nodes["REQ-1"].title == "First copy"
+
+    def test_schema_backlinks_excluded_from_parent_uids(self, fixtures_dir: Path) -> None:
+        """Test schema-declared backlink fields do not become parent_uids."""
+        export_path = fixtures_dir / "sphinxneeds" / "needs.json"
+        parser = SphinxNeedsParser(export_path)
+        nodes = parser.parse()
+
+        # HAZ-001 has links: [SG-001] and derived_from_back: [SG-001].
+        # backlinks (derived_from_back) must be excluded, leaving only the SG-001
+        # from the forward 'links' field.
+        haz = nodes["HAZ-001"]
+        assert haz.parent_uids == ["SG-001"]
+
+    def test_content_fallback_to_description(self, fixtures_dir: Path) -> None:
+        """Test statement falls back to description when content is absent."""
+        export_path = fixtures_dir / "sphinxneeds" / "needs.json"
+        parser = SphinxNeedsParser(export_path)
+        nodes = parser.parse()
+
+        assert nodes["SSR-001"].statement == "cam-service shall schedule a per-event timer"
+
+    def test_parse_fsc_node_type(self, fixtures_dir: Path) -> None:
+        """Test FSC (Functional Safety Concept) type is correctly mapped from 'fsc' type string."""
+        export_path = fixtures_dir / "sphinxneeds" / "needs.json"
+        parser = SphinxNeedsParser(export_path)
+        nodes = parser.parse()
+
+        fsc = nodes.get("FSC-001")
+        assert fsc is not None
+        assert fsc.node_type == "FSC"
+        assert fsc.asil == "ASIL_B"
+        assert fsc.document_path == Path("safety/fsc_doc")
+
+    def test_parse_tsr_node_type(self, fixtures_dir: Path) -> None:
+        """Test TSR (Technical Safety Requirement) type is correctly parsed."""
+        export_path = fixtures_dir / "sphinxneeds" / "needs.json"
+        parser = SphinxNeedsParser(export_path)
+        nodes = parser.parse()
+
+        tsr = nodes.get("TSR-001")
+        assert tsr is not None
+        assert tsr.node_type == "TSR"
+        assert tsr.asil == "ASIL_B"
+
+    def test_parse_swa_with_realises_link(self, fixtures_dir: Path) -> None:
+        """Test SWA node with a realises forward link maps to parent_uids."""
+        export_path = fixtures_dir / "sphinxneeds" / "needs.json"
+        parser = SphinxNeedsParser(export_path)
+        nodes = parser.parse()
+
+        swa = nodes.get("SWA-001")
+        assert swa is not None
+        assert swa.node_type == "SWA"
+        assert "SSR-001" in swa.parent_uids
+
+    def test_parse_infer_fsc_type_from_uid_prefix(self) -> None:
+        """Test _TYPE_MAP resolves 'fsc' type string to FSC (not UID inference)."""
+        assert SphinxNeedsParser._infer_node_type("fsc", "FSC-001") == "FSC"
+
+    def test_parse_infer_tsc_type_from_uid_prefix(self) -> None:
+        """Test _TYPE_MAP resolves 'tsc' type string to TSC."""
+        assert SphinxNeedsParser._infer_node_type("tsc", "TSC-001") == "TSC"

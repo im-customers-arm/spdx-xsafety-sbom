@@ -1,4 +1,4 @@
-"""
+﻿"""
 Main generator orchestration module.
 
 This module provides the high-level API for generating SPDX 3.0.1
@@ -36,27 +36,29 @@ def generate_design_sbom(
     organization: str | None = None,
     scan_source_markers: bool = True,
     validate_output: bool = True,
+    input_format: str = "auto",
 ) -> GenerationResult:
     """
     Generate an SPDX 3.0.1 Design SBOM with xSafety extensions.
 
     This is the main entry point for SBOM generation. It:
-    1. Parses StrictDoc sources for requirements
-    2. Optionally scans source files for @sdoc markers
+    1. Parses StrictDoc or Sphinx-Needs sources for requirements
+    2. Optionally scans source files for requirement markers (@sdoc, @need)
     3. Builds SPDX 3.0.1 elements with xSafety extensions
     4. Builds relationships (descendantOf, hasTestCase, testedOn, etc.)
     5. Writes JSON-LD output
 
     Args:
-        strictdoc_export_path: Path to StrictDoc directory or .sdoc file.
+        strictdoc_export_path: Path to StrictDoc directory, .sdoc file, or Sphinx-Needs needs.json.
         output_path: Path for output SBOM file.
         source_root: Optional root path for source code scanning.
         spdx_id_prefix: Prefix for SPDX element IDs.
         document_name: Name for the SPDX document.
         tool_name: Name of the generating tool.
         organization: Optional organization name.
-        scan_source_markers: Whether to scan for @sdoc markers.
+        scan_source_markers: Whether to scan for requirement markers.
         validate_output: Whether to validate generated SBOM.
+        input_format: Input format -- "auto" (detect), "strictdoc", or "sphinx-needs".
 
     Returns:
         GenerationResult with success status and details.
@@ -71,31 +73,37 @@ def generate_design_sbom(
         src_root = Path(source_root) if source_root else None
 
         logger.info("Starting SBOM generation")
-        logger.info("  StrictDoc source path: %s", export_path)
+        logger.info("  Input path: %s", export_path)
         logger.info("  Output: %s", out_path)
         if src_root:
             logger.info("  Source root: %s", src_root)
 
         # =================================================================
-        # Step 1: Parse StrictDoc source content
+        # Step 1: Parse requirements source content
         # =================================================================
-        logger.info("Parsing StrictDoc sources...")
-        parser = StrictDocParser(export_path)
+        fmt = _detect_input_format(export_path) if input_format == "auto" else input_format
+        logger.info("Parsing requirements (format: %s)...", fmt)
+        if fmt == "sphinx-needs":
+            from spdx_xsafety_sbom.sphinxneeds_parser import SphinxNeedsParser
+
+            parser = SphinxNeedsParser(export_path)
+        else:
+            parser = StrictDocParser(export_path)
         nodes = parser.parse()
 
         if not nodes:
-            result.errors.append("No requirements found in StrictDoc sources")
+            result.errors.append("No requirements found in sources")
             return result
 
         logger.info("Found %d requirements", len(nodes))
 
         # =================================================================
-        # Step 2: Scan source files for @sdoc markers
+        # Step 2: Scan source files for requirement markers
         # =================================================================
         source_links: dict[str, list[RangeLink]] = {}
 
         if scan_source_markers and src_root and src_root.exists():
-            logger.info("Scanning source files for @sdoc markers...")
+            logger.info("Scanning source files for requirement markers...")
             scanner = SourceScanner(src_root)
             source_links = scanner.scan()
             logger.info("Found markers for %d UIDs", len(source_links))
@@ -253,6 +261,26 @@ def _validate_document(document: dict[str, Any]) -> list[str]:
     return warnings
 
 
+def _detect_input_format(path: Path) -> str:
+    """
+    Auto-detect the input format from the given path.
+
+    Returns "sphinx-needs" if the path is (or contains) a needs.json file,
+    "strictdoc" if the directory contains .sdoc files, and defaults to
+    "strictdoc" with a warning otherwise.
+    """
+    if path.is_file() and path.name == "needs.json":
+        return "sphinx-needs"
+    if path.is_dir() and (path / "needs.json").exists():
+        return "sphinx-needs"
+    if path.is_dir() and any(path.rglob("*.sdoc")):
+        return "strictdoc"
+    logger.warning(
+        "Could not detect input format for %s; defaulting to strictdoc", path
+    )
+    return "strictdoc"
+
+
 def generate_from_config(config: GeneratorConfig) -> GenerationResult:
     """
     Generate SBOM from a GeneratorConfig object.
@@ -264,7 +292,7 @@ def generate_from_config(config: GeneratorConfig) -> GenerationResult:
         GenerationResult with success status and details.
     """
     return generate_design_sbom(
-        strictdoc_export_path=config.strictdoc_export_path,
+        strictdoc_export_path=config.input_path,
         output_path=config.output_path,
         source_root=config.source_root,
         spdx_id_prefix=config.spdx_id_prefix,
@@ -273,4 +301,5 @@ def generate_from_config(config: GeneratorConfig) -> GenerationResult:
         organization=config.creator_org,
         scan_source_markers=config.scan_source_markers,
         validate_output=config.validate_output,
+        input_format=config.input_format,
     )

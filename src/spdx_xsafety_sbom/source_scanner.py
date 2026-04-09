@@ -1,8 +1,8 @@
 """
-Source code scanner for @sdoc requirement markers.
+Source code scanner for @sdoc and @need requirement markers.
 
-This module scans source files to find @sdoc[UID] markers that link
-source code locations to requirements. These become SPDX testedOn
+This module scans source files to find @sdoc[UID] and @need[UID] markers
+that link source code locations to requirements. These become SPDX testedOn
 relationships with PositionalRange snippets.
 
 Example marker in source:
@@ -24,15 +24,15 @@ from spdx_xsafety_sbom.models import RangeLink
 
 logger = logging.getLogger(__name__)
 
-# Regex pattern for @sdoc[...] markers (supports multiple UIDs, closing tags)
-SDOC_MARKER_PATTERN = re.compile(r"@sdoc\[([^\]]+)\]")
+# Regex pattern for @sdoc[...] and @need[...] markers (supports multiple UIDs, closing tags)
+MARKER_PATTERN = re.compile(r"@(?:sdoc|need)\[([^\]]+)\]")
 
 
 class SourceScanner:
     """
-    Scanner for @sdoc markers in source code files.
+    Scanner for requirement markers (@sdoc, @need) in source code files.
 
-    Scans source files for @sdoc[UID] markers and extracts
+    Scans source files for @sdoc[UID] and @need[UID] markers and extracts
     line ranges and code snippets for SPDX traceability.
     """
 
@@ -64,7 +64,7 @@ class SourceScanner:
 
     def scan(self) -> dict[str, list[RangeLink]]:
         """
-        Scan source files for @sdoc markers.
+        Scan source files for requirement markers (@sdoc, @need).
 
         Returns:
             Dictionary mapping UID to list of RangeLinks.
@@ -84,7 +84,7 @@ class SourceScanner:
 
         total_links = sum(len(v) for v in links.values())
         logger.info(
-            "Found %d @sdoc markers across %d UIDs",
+            "Found %d requirement markers across %d UIDs",
             total_links,
             len(links),
         )
@@ -103,7 +103,7 @@ class SourceScanner:
 
     def _scan_file(self, file_path: Path) -> list[RangeLink]:
         """
-        Scan a single file for @sdoc markers.
+        Scan a single file for requirement markers.
 
         Args:
             file_path: Path to source file.
@@ -121,8 +121,8 @@ class SourceScanner:
             return []
 
         for line_num, line in enumerate(lines, start=1):
-            # Find all @sdoc markers on this line
-            matches = SDOC_MARKER_PATTERN.findall(line)
+            # Find all requirement markers on this line
+            matches = MARKER_PATTERN.findall(line)
 
             for match in matches:
                 raw_uids = [part.strip() for part in match.split(",")]
@@ -147,7 +147,7 @@ class SourceScanner:
                     )
                     links.append(link)
                     logger.debug(
-                        "Found @sdoc[%s] at %s:%d-%d",
+                        "Found marker[%s] at %s:%d-%d",
                         uid,
                         file_path.name,
                         line_num,
@@ -219,7 +219,7 @@ def scan_source_markers(
     excluded_dirs: list[str] | None = None,
 ) -> dict[str, list[RangeLink]]:
     """
-    Convenience function to scan for @sdoc markers.
+    Convenience function to scan for requirement markers (@sdoc, @need).
 
     Args:
         source_root: Root directory to scan.

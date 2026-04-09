@@ -27,8 +27,30 @@
           "asil": "ASIL_B",
           "docname": "safety/goal_doc",
           "derived_from": ["HAZ-001"],
-          "links": "SSR-001, TSR-001",
+          "links": "FSC-001",
+          "derived_from_back": ["FSC-001"]
+        },
+        "FSC-001": {
+          "id": "FSC-001",
+          "type": "fsc",
+          "title": "CAM timeout functional safety concept",
+          "content": "The CAM receiver shall detect message absence within the FTTI and trigger a safe state",
+          "asil": "ASIL_B",
+          "docname": "safety/fsc_doc",
+          "derived_from": ["SG-001"],
+          "links": ["TSR-001"],
           "derived_from_back": ["TSR-001"]
+        },
+        "TSR-001": {
+          "id": "TSR-001",
+          "type": "tsr",
+          "title": "CAM timeout technical safety requirement",
+          "content": "The diagnostic layer shall detect a missing CAM message within 1000ms",
+          "asil": "ASIL_B",
+          "docname": "safety/tsr_doc",
+          "derived_from": ["FSC-001"],
+          "links": ["SSR-001"],
+          "derived_from_back": ["SSR-001"]
         },
         "SSR-001": {
           "id": "SSR-001",
@@ -36,10 +58,21 @@
           "title": "Timer scheduling",
           "description": "cam-service shall schedule a per-event timer",
           "asil": "ASIL_B",
-          "derived_from": ["SG-001"],
+          "derived_from": ["TSR-001"],
           "tests": ["TC-001"],
           "file_links": ["src/cam/service.c", "src/cam/timer.c"],
           "docname": "safety/ssr_doc"
+        },
+        "SWA-001": {
+          "id": "SWA-001",
+          "type": "swa",
+          "title": "CamReceiver::checkTimeout()",
+          "content": "Software component responsible for detecting CAM message timeout and triggering safe state",
+          "asil": "ASIL_B",
+          "docname": "design/swa_doc",
+          "realises": ["SSR-001"],
+          "derived_from": [],
+          "derived_from_back": []
         },
         "TC-001": {
           "id": "TC-001",
