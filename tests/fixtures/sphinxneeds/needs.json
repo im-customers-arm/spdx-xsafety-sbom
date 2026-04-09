@@ -1,0 +1,94 @@
+{
+  "created": "2026-04-09T00:00:00Z",
+  "current_version": "",
+  "project": "spdx-xsafety-sbom-tests",
+  "versions": {
+    "": {
+      "needs": {
+        "HAZ-001": {
+          "id": "HAZ-001",
+          "type": "hazard",
+          "title": "Missing CAM message not detected",
+          "content": "Missing CAM message not detected within timeout period",
+          "asil": "ASIL_B",
+          "severity": "S2",
+          "exposure": "E3",
+          "controllability": "C2",
+          "docname": "safety/hazard_doc",
+          "links": ["SG-001"],
+          "derived_from": [],
+          "derived_from_back": ["SG-001"]
+        },
+        "SG-001": {
+          "id": "SG-001",
+          "type": "safety_goal",
+          "title": "CAM message timeout detection",
+          "content": "Ensure CAM message reception is monitored with timeout detection",
+          "asil": "ASIL_B",
+          "docname": "safety/goal_doc",
+          "derived_from": ["HAZ-001"],
+          "links": "SSR-001, TSR-001",
+          "derived_from_back": ["TSR-001"]
+        },
+        "SSR-001": {
+          "id": "SSR-001",
+          "type": "ssr",
+          "title": "Timer scheduling",
+          "description": "cam-service shall schedule a per-event timer",
+          "asil": "ASIL_B",
+          "derived_from": ["SG-001"],
+          "tests": ["TC-001"],
+          "file_links": ["src/cam/service.c", "src/cam/timer.c"],
+          "docname": "safety/ssr_doc"
+        },
+        "TC-001": {
+          "id": "TC-001",
+          "type": "test_case",
+          "title": "Test timer trigger",
+          "content": "Verify timer triggers on missing CAM message",
+          "derived_from": ["SSR-001"]
+        },
+        "EVID-001": {
+          "id": "EVID-001",
+          "type": "evidence",
+          "title": "Temporal fault evidence",
+          "content": "Logs for temporal fault case",
+          "artifact_id": "docs/evidence/EVID-001.txt",
+          "timestamp_utc": "2025-12-12T18:02:11Z",
+          "hash_value": "sha256:6f2b4d9f1a2b3c",
+          "validates": ["TC-001"]
+        },
+        "UNK-001": {
+          "id": "UNK-001",
+          "type": "",
+          "title": "Unknown type fallback",
+          "content": "Should use default node type"
+        }
+      },
+      "needs_schema": {
+        "properties": {
+          "id": {"field_type": "core"},
+          "title": {"field_type": "core"},
+          "content": {"field_type": "core"},
+          "description": {"field_type": "core"},
+          "type": {"field_type": "core"},
+          "asil": {"field_type": "extra"},
+          "severity": {"field_type": "extra"},
+          "exposure": {"field_type": "extra"},
+          "controllability": {"field_type": "extra"},
+          "docname": {"field_type": "core"},
+          "file_links": {"field_type": "extra"},
+          "artifact_id": {"field_type": "extra"},
+          "timestamp_utc": {"field_type": "extra"},
+          "hash_value": {"field_type": "extra"},
+          "derived_from": {"field_type": "links"},
+          "links": {"field_type": "links"},
+          "tests": {"field_type": "links"},
+          "validates": {"field_type": "links"},
+          "realises": {"field_type": "links"},
+          "derived_from_back": {"field_type": "backlinks"}
+        }
+      }
+    }
+  }
+}
