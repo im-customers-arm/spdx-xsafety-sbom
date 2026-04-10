@@ -175,7 +175,7 @@ jobs:
               doc = json.load(f)
           assert '@context' in doc
           assert '@graph' in doc
-          print(f'Generated SBOM with {len(doc[\"@graph\"])} elements')
+          print('Generated SBOM with', len(doc['@graph']), 'elements')
           "
 
       - name: Verify Sphinx-Needs JSON-LD structure
@@ -186,5 +186,5 @@ jobs:
               doc = json.load(f)
           assert '@context' in doc
           assert '@graph' in doc
-          print(f'Generated Sphinx-Needs SBOM with {len(doc["@graph"])} elements')
+          print('Generated Sphinx-Needs SBOM with', len(doc['@graph']), 'elements')
           "
