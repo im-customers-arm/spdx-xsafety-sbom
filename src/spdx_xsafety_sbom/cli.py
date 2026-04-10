@@ -180,9 +180,7 @@ def generate(
         effective_source_root = auto_detect_source_root(input_path)
         if effective_source_root:
             source_root_auto = True
-            console.print(
-                f"[dim]Auto-detected source root: {effective_source_root}[/]"
-            )
+            console.print(f"[dim]Auto-detected source root: {effective_source_root}[/]")
 
     # Show configuration
     config_table = Table(title="Configuration", show_header=False)
@@ -192,8 +190,10 @@ def generate(
     config_table.add_row("Input Format", input_format)
     config_table.add_row("Output", str(output))
     source_root_display = (
-        f"{effective_source_root} (auto)" if source_root_auto
-        else str(effective_source_root) if effective_source_root
+        f"{effective_source_root} (auto)"
+        if source_root_auto
+        else str(effective_source_root)
+        if effective_source_root
         else "None (use --source-root to enable)"
     )
     config_table.add_row("Source Root", source_root_display)

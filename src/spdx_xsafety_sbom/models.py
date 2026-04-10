@@ -158,33 +158,23 @@ class GeneratorConfig(BaseModel):
         "auto",
         description="Input format: auto-detect, strictdoc (.sdoc), or sphinx-needs (needs.json)",
     )
-    source_root: Path | None = Field(
-        None, description="Root path for source code scanning"
-    )
+    source_root: Path | None = Field(None, description="Root path for source code scanning")
 
     # Output configuration
     output_path: Path = Field(..., description="Output file path for SBOM")
-    output_format: Literal["json-ld", "json"] = Field(
-        "json-ld", description="Output format"
-    )
+    output_format: Literal["json-ld", "json"] = Field("json-ld", description="Output format")
 
     # SPDX configuration
-    spdx_id_prefix: str = Field(
-        "urn:spdx:example:", description="Prefix for SPDX element IDs"
-    )
+    spdx_id_prefix: str = Field("urn:spdx:example:", description="Prefix for SPDX element IDs")
     document_name: str = Field("design-sbom", description="Name of the SPDX document")
-    document_namespace: str | None = Field(
-        None, description="Namespace URI for the document"
-    )
+    document_namespace: str | None = Field(None, description="Namespace URI for the document")
 
     # Creator information
     creator_name: str = Field("spdx-xsafety-sbom", description="Tool name")
     creator_org: str | None = Field(None, description="Organization name")
 
     # Feature flags
-    include_source_links: bool = Field(
-        True, description="Include source code range links"
-    )
+    include_source_links: bool = Field(True, description="Include source code range links")
     scan_source_markers: bool = Field(
         True, description="Scan source files for requirement markers (@sdoc, @need)"
     )

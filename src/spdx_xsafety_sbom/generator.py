@@ -1,4 +1,4 @@
-﻿"""
+"""
 Main generator orchestration module.
 
 This module provides the high-level API for generating SPDX 3.0.1
@@ -86,10 +86,9 @@ def generate_design_sbom(
         if fmt == "sphinx-needs":
             from spdx_xsafety_sbom.sphinxneeds_parser import SphinxNeedsParser
 
-            parser = SphinxNeedsParser(export_path)
+            nodes = SphinxNeedsParser(export_path).parse()
         else:
-            parser = StrictDocParser(export_path)
-        nodes = parser.parse()
+            nodes = StrictDocParser(export_path).parse()
 
         if not nodes:
             result.errors.append("No requirements found in sources")
@@ -249,11 +248,7 @@ def _validate_document(document: dict[str, Any]) -> list[str]:
 
     orphans = element_ids - relationship_refs - root_elements
     # Filter out creator/tool elements
-    orphans = {
-        oid
-        for oid in orphans
-        if not any(x in oid for x in ["tool-", "org-", "document-"])
-    }
+    orphans = {oid for oid in orphans if not any(x in oid for x in ["tool-", "org-", "document-"])}
 
     if orphans:
         warnings.append(f"Found {len(orphans)} potentially orphan elements")
@@ -275,9 +270,7 @@ def _detect_input_format(path: Path) -> str:
         return "sphinx-needs"
     if path.is_dir() and any(path.rglob("*.sdoc")):
         return "strictdoc"
-    logger.warning(
-        "Could not detect input format for %s; defaulting to strictdoc", path
-    )
+    logger.warning("Could not detect input format for %s; defaulting to strictdoc", path)
     return "strictdoc"
 
 

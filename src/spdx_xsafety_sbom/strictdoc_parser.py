@@ -33,14 +33,14 @@ try:
     # Import TextX exceptions for better error handling
     try:
         from textx.exceptions import TextXSyntaxError  # type: ignore[import-untyped]
+
         _TEXTX_AVAILABLE = True
     except ImportError:
         _TEXTX_AVAILABLE = False
         TextXSyntaxError = Exception  # Fallback
 except ImportError as e:
     raise ImportError(
-        "StrictDoc library is required for native parsing. "
-        "Install with: uv add strictdoc"
+        "StrictDoc library is required for native parsing. Install with: uv add strictdoc"
     ) from e
 
 
@@ -90,6 +90,7 @@ class StrictDocParser:
 
         # Extract line and column info if available
         import re
+
         line_match = re.search(r":(\d+):(\d+):", error_msg)
         if line_match:
             line_num = int(line_match.group(1))
@@ -103,9 +104,9 @@ class StrictDocParser:
                         problem_line = lines[line_num - 1].rstrip()
 
                         msg_parts = [
-                            f"\n{'='*70}",
+                            f"\n{'=' * 70}",
                             f"StrictDoc Syntax Error in: {file_path}",
-                            f"{'='*70}",
+                            f"{'=' * 70}",
                             f"Line {line_num}, Column {col_num}:",
                             f"  {problem_line}",
                             f"  {' ' * (col_num - 1)}^",
@@ -122,7 +123,7 @@ class StrictDocParser:
                             "",
                             "For more details, run:",
                             f"  uv run strictdoc --debug export {file_path.parent}",
-                            f"{'='*70}\n",
+                            f"{'=' * 70}\n",
                         ]
                         return "\n".join(msg_parts)
             except Exception:
@@ -182,8 +183,7 @@ class StrictDocParser:
                     self._parse_native_file(self.path)
             else:
                 raise ValueError(
-                    f"Unsupported file type: {self.path.suffix}. "
-                    "Only .sdoc files are supported."
+                    f"Unsupported file type: {self.path.suffix}. Only .sdoc files are supported."
                 )
         else:
             # Directory: check for custom grammars
@@ -203,7 +203,9 @@ class StrictDocParser:
                 try:
                     all_files = list(self.path.glob("**/*"))[:10]
                     if all_files:
-                        error_msg += "  " + "\n  ".join(str(f.relative_to(self.path)) for f in all_files if f.is_file())
+                        error_msg += "  " + "\n  ".join(
+                            str(f.relative_to(self.path)) for f in all_files if f.is_file()
+                        )
                     else:
                         error_msg += "  (directory is empty)"
                 except Exception:
@@ -264,9 +266,11 @@ class StrictDocParser:
             # Find strictdoc in the current environment (venv or system)
             # Check if we're in a venv and use its Scripts directory
             strictdoc_cmd = None
-            if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
+            if hasattr(sys, "real_prefix") or (
+                hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix
+            ):
                 # We're in a virtual environment
-                if os.name == 'nt':  # Windows
+                if os.name == "nt":  # Windows
                     venv_strictdoc = Path(sys.prefix) / "Scripts" / "strictdoc.exe"
                 else:  # Linux/Mac
                     venv_strictdoc = Path(sys.prefix) / "bin" / "strictdoc"
@@ -279,9 +283,7 @@ class StrictDocParser:
                 strictdoc_cmd = shutil.which("strictdoc")
 
             if not strictdoc_cmd:
-                raise RuntimeError(
-                    "StrictDoc CLI not found. Install with: uv add strictdoc"
-                )
+                raise RuntimeError("StrictDoc CLI not found. Install with: uv add strictdoc")
 
             logger.debug("Using StrictDoc at: %s", strictdoc_cmd)
 
@@ -313,9 +315,9 @@ class StrictDocParser:
                     # Check for common error patterns
                     if "TextXSyntaxError" in error_output:
                         error_msg = (
-                            f"\n{'='*70}\n"
+                            f"\n{'=' * 70}\n"
                             f"StrictDoc Export Failed: Syntax Error Detected\n"
-                            f"{'='*70}\n"
+                            f"{'=' * 70}\n"
                             f"{error_output}\n\n"
                             f"This indicates a syntax error in one of your .sdoc files.\n\n"
                             f"Common fixes:\n"
@@ -326,17 +328,18 @@ class StrictDocParser:
                             f"To find the exact error:\n"
                             f"  cd {self.path}\n"
                             f"  uv run strictdoc --debug export .\n"
-                            f"{'='*70}\n"
+                            f"{'=' * 70}\n"
                         )
                     elif "Could not parse file" in error_output:
                         # Extract filename if possible
                         import re
+
                         file_match = re.search(r"Could not parse file: ([^\n]+)", error_output)
                         problem_file = file_match.group(1) if file_match else "unknown"
                         error_msg = (
-                            f"\n{'='*70}\n"
+                            f"\n{'=' * 70}\n"
                             f"StrictDoc Export Failed: Parse Error\n"
-                            f"{'='*70}\n"
+                            f"{'=' * 70}\n"
                             f"Problem file: {problem_file}\n\n"
                             f"{error_output}\n\n"
                             f"Troubleshooting steps:\n"
@@ -346,14 +349,14 @@ class StrictDocParser:
                             f"  4. Check for invalid field names\n\n"
                             f"For debugging:\n"
                             f"  uv run strictdoc --debug export {self.path}\n"
-                            f"{'='*70}\n"
+                            f"{'=' * 70}\n"
                         )
                     else:
                         error_msg = (
                             f"\nStrictDoc export failed with exit code {result.returncode}\n"
-                            f"{'='*70}\n"
+                            f"{'=' * 70}\n"
                             f"{error_output}\n"
-                            f"{'='*70}\n\n"
+                            f"{'=' * 70}\n\n"
                             f"Working directory: {self.path}\n\n"
                             f"Try running manually for more details:\n"
                             f"  cd {self.path}\n"
@@ -524,9 +527,9 @@ class StrictDocParser:
             # raise an error indicating export-based parsing is needed
             if grammar_path.exists() and grammar_path.suffix == ".sgra":
                 raise ValueError(
-                    f"\n{'='*70}\n"
+                    f"\n{'=' * 70}\n"
                     f"Custom Grammar Detected: {grammar_filename}\n"
-                    f"{'='*70}\n"
+                    f"{'=' * 70}\n"
                     f"This file uses a custom StrictDoc grammar (.sgra file).\n"
                     f"Custom grammars require export-based parsing.\n\n"
                     f"To validate files with custom grammars:\n"
@@ -536,7 +539,7 @@ class StrictDocParser:
                     f"     uv run strictdoc export {base_path}\n\n"
                     f"The parser will automatically use export-based parsing\n"
                     f"when validating a directory containing .sgra files.\n"
-                    f"{'='*70}\n"
+                    f"{'=' * 70}\n"
                 )
 
             # For non-custom grammars, inline them
@@ -655,9 +658,7 @@ class StrictDocParser:
 
         # Extract fields
         title = node.reserved_title
-        statement = (
-            node.reserved_statement if hasattr(node, "reserved_statement") else None
-        )
+        statement = node.reserved_statement if hasattr(node, "reserved_statement") else None
         rationale = node.rationale if hasattr(node, "rationale") else None
         comment = self._get_native_field_value(node, "COMMENT")
 

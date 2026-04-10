@@ -69,12 +69,12 @@ logger = logging.getLogger(__name__)
 # When a schema IS present the parser reads ALL ``field_type: "links"``
 # fields dynamically, so custom link types are captured automatically.
 _PARENT_LINK_FIELDS: tuple[str, ...] = (
-    "derived_from",   # HAZ → SG, SG → TSR, etc.
-    "links",          # generic forward links
-    "parent_needs",   # Sphinx-Needs built-in parent link
-    "tests",          # TC tests SSR
-    "validates",      # EVID validates TC
-    "realises",       # SWA realises SSR
+    "derived_from",  # HAZ → SG, SG → TSR, etc.
+    "links",  # generic forward links
+    "parent_needs",  # Sphinx-Needs built-in parent link
+    "tests",  # TC tests SSR
+    "validates",  # EVID validates TC
+    "realises",  # SWA realises SSR
 )
 
 # Sphinx-Needs directive ``type`` → canonical node-type abbreviation.
@@ -84,21 +84,21 @@ _PARENT_LINK_FIELDS: tuple[str, ...] = (
 #   3. ``raw_type.upper()`` as a final fallback.
 _TYPE_MAP: dict[str, str] = {
     # Generic Sphinx-Needs built-in types
-    "req":          "REQUIREMENT",
-    "spec":         "SPEC",
-    "impl":         "IMPL",
-    "test":         "TC",
-    "need":         "NEED",
+    "req": "REQUIREMENT",
+    "spec": "SPEC",
+    "impl": "IMPL",
+    "test": "TC",
+    "need": "NEED",
     # Safety-specific types used in this project
-    "evidence":              "EVID",
-    "test_case":             "TC",
-    "hazard":                "HAZ",
-    "safety_goal":           "SG",
-    "fsc":                   "FSC",   # Functional Safety Concept per ISO 26262
-    "tsc":                   "TSC",   # Technical Safety Concept per ISO 26262
-    "ssr":                   "SSR",
-    "swa":                   "SWA",
-    "tsr":                   "TSR",
+    "evidence": "EVID",
+    "test_case": "TC",
+    "hazard": "HAZ",
+    "safety_goal": "SG",
+    "fsc": "FSC",  # Functional Safety Concept per ISO 26262
+    "tsc": "TSC",  # Technical Safety Concept per ISO 26262
+    "ssr": "SSR",
+    "swa": "SWA",
+    "tsr": "TSR",
 }
 
 _DEFAULT_NODE_TYPE = "REQUIREMENT"
@@ -153,24 +153,24 @@ class SphinxNeedsParser:
             FileNotFoundError: If the file does not exist.
             ValueError: If the JSON structure is not a valid needs.json.
         """
-        if not self.path.exists():
-            raise FileNotFoundError(f"needs.json not found: {self.path}")
-
-        self._nodes = {}
+        nodes: dict[str, StrictDocNode] = {}
 
         try:
             with open(self.path, encoding="utf-8") as fh:
                 data: dict[str, Any] = json.load(fh)
-        except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"Invalid JSON in needs.json — {exc.msg} "
-                f"(line {exc.lineno}, col {exc.colno}): {self.path}"
-            ) from exc
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(f"needs.json not found: {self.path}") from exc
+        except (json.JSONDecodeError, OSError) as exc:
+            if isinstance(exc, json.JSONDecodeError):
+                raise ValueError(
+                    f"Invalid JSON in needs.json — {exc.msg} "
+                    f"(line {exc.lineno}, col {exc.colno}): {self.path}"
+                ) from exc
+            else:
+                raise ValueError(f"Cannot read needs.json: {exc}") from exc
 
         if "versions" not in data:
-            raise ValueError(
-                f"Invalid needs.json — missing top-level 'versions' key: {self.path}"
-            )
+            raise ValueError(f"Invalid needs.json — missing top-level 'versions' key: {self.path}")
 
         # Resolve the version to parse: prefer current_version, fall
         # back to the first (or only) version key present.
@@ -211,16 +211,17 @@ class SphinxNeedsParser:
         self._verify_safety_extra_fields(fields_by_type)
 
         for need_id, need_data in raw_needs.items():
-            self._parse_need(need_id, need_data, backlink_fields, link_fields)
+            self._parse_need(need_id, need_data, backlink_fields, link_fields, nodes)
 
-        self._build_child_relationships()
+        self._build_child_relationships(nodes)
 
         logger.info(
             "SphinxNeedsParser: parsed %d nodes from %s",
-            len(self._nodes),
+            len(nodes),
             self.path,
         )
-        return self._nodes
+        self._nodes = nodes  # cache for callers that inspect _nodes directly
+        return nodes  # return the local var; avoids aliasing via self._nodes
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -244,9 +245,7 @@ class SphinxNeedsParser:
 
         If the version has no ``needs_schema`` the result is an empty dict.
         """
-        schema_props: dict[str, Any] = (
-            version_data.get("needs_schema", {}).get("properties", {})
-        )
+        schema_props: dict[str, Any] = version_data.get("needs_schema", {}).get("properties", {})
         index: dict[str, set[str]] = {}
         for name, meta in schema_props.items():
             if isinstance(meta, dict):
@@ -267,7 +266,20 @@ class SphinxNeedsParser:
         needs.json was generated without those options the fields will be
         absent from the need dicts and extraction will silently yield ``None``;
         this log message surfaces that situation.
+
+        ``fields_by_type`` is empty when the export contains no ``needs_schema``
+        (older Sphinx-Needs or minimal exports); in that case all safety fields
+        will be absent from every need dict.
         """
+        if not fields_by_type:
+            logger.debug(
+                "needs_schema not present in export — this may be from an older "
+                "Sphinx-Needs version or a minimal export. Safety fields (%s) "
+                "will be None for all nodes.",
+                list(_SAFETY_EXTRA_FIELDS),
+            )
+            return
+
         registered_extras: frozenset[str] = fields_by_type.get("extra", frozenset())
         missing = [f for f in _SAFETY_EXTRA_FIELDS if f not in registered_extras]
         if missing:
@@ -289,6 +301,7 @@ class SphinxNeedsParser:
         need: dict[str, Any],
         backlink_fields: frozenset[str],
         link_fields: frozenset[str],
+        nodes: dict[str, StrictDocNode],
     ) -> None:
         """Parse a single need dict into a :class:`StrictDocNode`."""
 
@@ -300,7 +313,14 @@ class SphinxNeedsParser:
             )
             return
 
-        if uid in self._nodes:
+        if uid != need_id:
+            logger.debug(
+                "Need dict key %r differs from embedded id %r — using embedded id as UID",
+                need_id,
+                uid,
+            )
+
+        if uid in nodes:
             logger.warning(
                 "Duplicate need id %r — skipping second occurrence (dict key %r)",
                 uid,
@@ -349,9 +369,7 @@ class SphinxNeedsParser:
         # ``@sdoc`` markers and stores them in StrictDocNode.file_refs.
         raw_file_links = need.get("file_links") or []
         file_refs: list[str] = (
-            [str(f) for f in raw_file_links if f]
-            if isinstance(raw_file_links, list)
-            else []
+            [str(f) for f in raw_file_links if f] if isinstance(raw_file_links, list) else []
         )
 
         # --- Parent UIDs (outgoing traceability links) ---
@@ -375,7 +393,7 @@ class SphinxNeedsParser:
             document_path=document_path,
         )
 
-        self._nodes[uid] = node
+        nodes[uid] = node
         logger.debug(
             "Parsed need: %s (type=%s, parents=%s)",
             uid,
@@ -411,11 +429,11 @@ class SphinxNeedsParser:
             else:
                 items = [v.strip() for v in str(raw_value).split(",") if v.strip()]
 
-            for uid in items:
-                uid = uid.strip()
-                if uid and uid not in seen:
-                    seen.add(uid)
-                    parent_uids.append(uid)
+            for item_uid in items:
+                item_uid = item_uid.strip()
+                if item_uid and item_uid not in seen:
+                    seen.add(item_uid)
+                    parent_uids.append(item_uid)
 
         return parent_uids
 
@@ -448,14 +466,20 @@ class SphinxNeedsParser:
 
         return raw_type.upper()
 
-    def _build_child_relationships(self) -> None:
+    def _build_child_relationships(self, nodes: dict[str, StrictDocNode]) -> None:
         """
         Populate ``child_uids`` as the reverse of ``parent_uids``.
 
         Mirrors the behaviour of ``StrictDocParser._build_child_relationships``.
+        Uses a set-based accumulator to avoid O(n) lookup on list membership.
         """
-        for uid, node in self._nodes.items():
+        # Accumulate children using sets for O(1) membership check
+        child_uid_sets: dict[str, set[str]] = {}
+        for uid, node in nodes.items():
             for parent_uid in node.parent_uids:
-                parent_node = self._nodes.get(parent_uid)
-                if parent_node is not None and uid not in parent_node.child_uids:
-                    parent_node.child_uids.append(uid)
+                if parent_uid in nodes:
+                    child_uid_sets.setdefault(parent_uid, set()).add(uid)
+
+        # Convert sets to lists and assign to nodes
+        for parent_uid, child_set in child_uid_sets.items():
+            nodes[parent_uid].child_uids.extend(child_set)

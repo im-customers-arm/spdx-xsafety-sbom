@@ -49,9 +49,7 @@ class TestValidateStructure:
         """Test validation catches missing SpdxDocument."""
         document = {
             "@context": ["https://spdx.org/rdf/3.0.1/spdx-context.jsonld"],
-            "@graph": [
-                {"@type": "Bundle", "spdxId": "urn:test:1", "name": "Test"}
-            ],
+            "@graph": [{"@type": "Bundle", "spdxId": "urn:test:1", "name": "Test"}],
         }
         result = validate_structure(document)
 

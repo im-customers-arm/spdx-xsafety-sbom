@@ -238,27 +238,21 @@ def _validate_relationship(
     # Check 'from' reference
     from_id = rel.get("from")
     if from_id and from_id not in element_ids:
-        result.warnings.append(
-            f"Relationship 'from' references unknown element: {from_id}"
-        )
+        result.warnings.append(f"Relationship 'from' references unknown element: {from_id}")
 
     # Check 'to' references
     to_ids = rel.get("to", [])
     if isinstance(to_ids, list):
         for to_id in to_ids:
             if to_id not in element_ids:
-                result.warnings.append(
-                    f"Relationship 'to' references unknown element: {to_id}"
-                )
+                result.warnings.append(f"Relationship 'to' references unknown element: {to_id}")
 
 
 def _validate_element(elem: dict[str, Any], result: ValidationResult) -> None:
     """Validate a generic SPDX element."""
     # Must have spdxId
     if "spdxId" not in elem:
-        result.errors.append(
-            f"Element missing spdxId: {elem.get('@type', 'unknown type')}"
-        )
+        result.errors.append(f"Element missing spdxId: {elem.get('@type', 'unknown type')}")
 
     # Must have @type or type
     if "@type" not in elem and "type" not in elem:
@@ -285,9 +279,7 @@ def _validate_extension(
 
     # Check for xSafety namespace prefix
     if not ext_type.startswith("xSafety:"):
-        result.warnings.append(
-            f"Extension type {ext_type} does not use xSafety namespace"
-        )
+        result.warnings.append(f"Extension type {ext_type} does not use xSafety namespace")
 
     # Validate known extension types
     valid_types = {
@@ -311,15 +303,11 @@ def _validate_extension(
 
     elif ext_type == "xSafety:SafetyGoalExtension":
         if "xSafety:safetyIntegrityLevel" not in ext:
-            result.errors.append(
-                f"SafetyGoalExtension on {parent_id} missing safetyIntegrityLevel"
-            )
+            result.errors.append(f"SafetyGoalExtension on {parent_id} missing safetyIntegrityLevel")
 
     elif ext_type == "xSafety:SafetyEvidenceExtension":
         if "xSafety:evidenceType" not in ext:
-            result.errors.append(
-                f"SafetyEvidenceExtension on {parent_id} missing evidenceType"
-            )
+            result.errors.append(f"SafetyEvidenceExtension on {parent_id} missing evidenceType")
         artifact_id = ext.get("xSafety:artifactId")
         if artifact_id is not None and not isinstance(artifact_id, str):
             result.errors.append(

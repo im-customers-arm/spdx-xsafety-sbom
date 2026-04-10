@@ -96,10 +96,7 @@ class TestSourceScanner:
         """Test scanning source files for @need markers."""
         source_file = tmp_path / "cam_service_need.c"
         source_file.write_text(
-            "// @need[SSR-010]\n"
-            "void check_timeout(void) {\n"
-            "    trigger_alarm();\n"
-            "}\n",
+            "// @need[SSR-010]\nvoid check_timeout(void) {\n    trigger_alarm();\n}\n",
             encoding="utf-8",
         )
 
@@ -113,10 +110,7 @@ class TestSourceScanner:
         """Test @need markers strip a leading slash from UIDs."""
         source_file = tmp_path / "cam_service_need_close.c"
         source_file.write_text(
-            "// @need[/SSR-011, SSR-012]\n"
-            "void check_close_style_uid(void) {\n"
-            "    return;\n"
-            "}\n",
+            "// @need[/SSR-011, SSR-012]\nvoid check_close_style_uid(void) {\n    return;\n}\n",
             encoding="utf-8",
         )
 

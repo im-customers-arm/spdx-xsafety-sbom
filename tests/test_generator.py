@@ -15,13 +15,16 @@ from spdx_xsafety_sbom.generator import (
 from spdx_xsafety_sbom.models import GeneratorConfig
 
 
-def _extract_graph_elements_by_name(document: dict[str, object]) -> tuple[dict[str, dict[str, object]], set[tuple[str, str, str]]]:
+def _extract_graph_elements_by_name(
+    document: dict[str, object],
+) -> tuple[dict[str, dict[str, object]], set[tuple[str, str, str]]]:
     """Extract stable element and relationship views from a generated graph."""
     graph = document["@graph"]
     id_to_name = {
         element["spdxId"]: element["name"]
         for element in graph
-        if isinstance(element, dict) and element.get("@type") not in {"Relationship", "SpdxDocument"}
+        if isinstance(element, dict)
+        and element.get("@type") not in {"Relationship", "SpdxDocument"}
     }
     elements_by_name = {
         element["name"]: {
@@ -50,9 +53,7 @@ def _extract_graph_elements_by_name(document: dict[str, object]) -> tuple[dict[s
 class TestGenerateDesignSbom:
     """Tests for generate_design_sbom function."""
 
-    def test_generate_from_strictdoc_export(
-        self, fixtures_dir: Path, tmp_output: Path
-    ) -> None:
+    def test_generate_from_strictdoc_export(self, fixtures_dir: Path, tmp_output: Path) -> None:
         """Test generating SBOM from StrictDoc .sdoc files."""
         export_path = fixtures_dir / "sdoc"
 
@@ -75,9 +76,7 @@ class TestGenerateDesignSbom:
         assert "@context" in document
         assert "@graph" in document
 
-    def test_generate_with_source_scanning(
-        self, fixtures_dir: Path, tmp_output: Path
-    ) -> None:
+    def test_generate_with_source_scanning(self, fixtures_dir: Path, tmp_output: Path) -> None:
         """Test generating SBOM with source code scanning."""
         export_path = fixtures_dir / "sdoc"
         source_path = fixtures_dir / "source"
@@ -97,17 +96,11 @@ class TestGenerateDesignSbom:
         with open(tmp_output) as f:
             document = json.load(f)
 
-        relationships = [
-            e for e in document["@graph"] if e.get("@type") == "Relationship"
-        ]
-        tested_on_rels = [
-            r for r in relationships if r.get("relationshipType") == "testedOn"
-        ]
+        relationships = [e for e in document["@graph"] if e.get("@type") == "Relationship"]
+        tested_on_rels = [r for r in relationships if r.get("relationshipType") == "testedOn"]
         assert len(tested_on_rels) > 0
 
-    def test_generate_creates_output_directory(
-        self, fixtures_dir: Path, tmp_path: Path
-    ) -> None:
+    def test_generate_creates_output_directory(self, fixtures_dir: Path, tmp_path: Path) -> None:
         """Test that output directory is created if missing."""
         export_path = fixtures_dir / "sdoc"
         output_path = tmp_path / "subdir" / "nested" / "output.json"
@@ -122,9 +115,7 @@ class TestGenerateDesignSbom:
         assert output_path.exists()
         assert output_path.parent.exists()
 
-    def test_generate_with_custom_prefix(
-        self, fixtures_dir: Path, tmp_output: Path
-    ) -> None:
+    def test_generate_with_custom_prefix(self, fixtures_dir: Path, tmp_output: Path) -> None:
         """Test generating SBOM with custom SPDX ID prefix."""
         export_path = fixtures_dir / "sdoc"
 
@@ -169,9 +160,7 @@ class TestGenerateDesignSbom:
         assert not result.success
         assert any("No requirements found" in e for e in result.errors)
 
-    def test_result_includes_timing(
-        self, fixtures_dir: Path, tmp_output: Path
-    ) -> None:
+    def test_result_includes_timing(self, fixtures_dir: Path, tmp_output: Path) -> None:
         """Test that result includes generation time."""
         export_path = fixtures_dir / "sdoc"
 
@@ -208,10 +197,7 @@ class TestGenerateDesignSbom:
         source_root = tmp_path / "source"
         source_root.mkdir()
         (source_root / "cam_service_need.c").write_text(
-            "// @need[SSR-001]\n"
-            "void schedule_timeout_timer(void) {\n"
-            "    trigger_alarm();\n"
-            "}\n",
+            "// @need[SSR-001]\nvoid schedule_timeout_timer(void) {\n    trigger_alarm();\n}\n",
             encoding="utf-8",
         )
 
@@ -229,12 +215,8 @@ class TestGenerateDesignSbom:
         with open(tmp_output, encoding="utf-8") as f:
             document = json.load(f)
 
-        relationships = [
-            e for e in document["@graph"] if e.get("@type") == "Relationship"
-        ]
-        tested_on_rels = [
-            r for r in relationships if r.get("relationshipType") == "testedOn"
-        ]
+        relationships = [e for e in document["@graph"] if e.get("@type") == "Relationship"]
+        tested_on_rels = [r for r in relationships if r.get("relationshipType") == "testedOn"]
         assert tested_on_rels
 
     def test_detect_input_format(self, fixtures_dir: Path, sample_sphinxneeds_export: Path) -> None:
@@ -301,8 +283,12 @@ class TestGenerateDesignSbom:
         with open(sphinxneeds_output, encoding="utf-8") as f:
             sphinxneeds_document = json.load(f)
 
-        strictdoc_elements, strictdoc_relationships = _extract_graph_elements_by_name(strictdoc_document)
-        sphinxneeds_elements, sphinxneeds_relationships = _extract_graph_elements_by_name(sphinxneeds_document)
+        strictdoc_elements, strictdoc_relationships = _extract_graph_elements_by_name(
+            strictdoc_document
+        )
+        sphinxneeds_elements, sphinxneeds_relationships = _extract_graph_elements_by_name(
+            sphinxneeds_document
+        )
 
         shared_names = {"HAZ-001", "SG-001", "SSR-001", "TC-001", "EVID-001"}
         expected_relationships = {
@@ -318,4 +304,3 @@ class TestGenerateDesignSbom:
         }
         assert expected_relationships <= strictdoc_relationships
         assert expected_relationships <= sphinxneeds_relationships
-
