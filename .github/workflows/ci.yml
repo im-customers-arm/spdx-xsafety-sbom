@@ -101,13 +101,14 @@ jobs:
       - name: Set up Python
         run: uv python install 3.12
 
+      - name: Install dependencies
+        run: uv sync --dev
+
       - name: Build package
         run: uv build
 
       - name: Check package
-        run: |
-          uv run pip install twine
-          uv run twine check dist/*
+        run: uvx twine check dist/*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -155,6 +156,17 @@ jobs:
       - name: Validate generated SBOM
         run: uv run spdx-xsafety-sbom validate test-output.json
 
+      - name: Generate Sphinx-Needs test SBOM
+        run: |
+          uv run spdx-xsafety-sbom generate \
+            tests/fixtures/sphinxneeds/needs.json \
+            -o test-output-sphinxneeds.json \
+            --no-source-scan \
+            --input-format sphinx-needs
+
+      - name: Validate generated Sphinx-Needs SBOM
+        run: uv run spdx-xsafety-sbom validate test-output-sphinxneeds.json
+
       - name: Verify JSON-LD structure
         run: |
           uv run python -c "
@@ -164,4 +176,15 @@ jobs:
           assert '@context' in doc
           assert '@graph' in doc
           print(f'Generated SBOM with {len(doc[\"@graph\"])} elements')
+          "
+
+      - name: Verify Sphinx-Needs JSON-LD structure
+        run: |
+          uv run python -c "
+          import json
+          with open('test-output-sphinxneeds.json') as f:
+              doc = json.load(f)
+          assert '@context' in doc
+          assert '@graph' in doc
+          print(f'Generated Sphinx-Needs SBOM with {len(doc["@graph"])} elements')
           "

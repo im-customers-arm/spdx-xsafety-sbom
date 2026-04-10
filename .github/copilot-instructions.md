@@ -28,7 +28,7 @@ uv run ruff format --check src/ tests/
 uv run mypy src/
 uv run pytest tests/ -v --tb=short
 uv build
-uv run twine check dist/*
+uvx twine check dist/*
 uv run spdx-xsafety-sbom generate tests/fixtures/sdoc -o test-output.json --no-source-scan
 uv run spdx-xsafety-sbom validate test-output.json
 ```

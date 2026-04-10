@@ -10,6 +10,7 @@ STATEMENT: Missing CAM message not detected within timeout period
 UID: SG-001
 TITLE: CAM message timeout detection
 STATEMENT: Ensure CAM message reception is monitored with timeout detection
+ASIL: ASIL_B
 RELATIONS:
 - TYPE: Parent
   VALUE: HAZ-001
