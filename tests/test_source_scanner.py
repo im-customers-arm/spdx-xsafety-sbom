@@ -91,3 +91,55 @@ class TestSourceScanner:
         assert "beginPointer" in spdx_range
         assert "endPointer" in spdx_range
         assert spdx_range["beginPointer"]["lineNumber"] == link.line_start
+
+    def test_scan_need_marker(self, fixtures_dir: Path) -> None:
+        """Test scanning source files for @need markers using the shared fixture."""
+        source_dir = fixtures_dir / "source"
+        scanner = SourceScanner(source_dir)
+        links = scanner.scan()
+
+        fixture_file = source_dir / "cam_service_need.c"
+        assert "SSR-001" in links
+        assert any(link.file_path == fixture_file for link in links["SSR-001"])
+
+    def test_scan_need_marker_with_closing_tag_style_uid(self, tmp_path: Path) -> None:
+        """Test @need markers strip a leading slash from UIDs."""
+        source_file = tmp_path / "cam_service_need_close.c"
+        source_file.write_text(
+            "// @need[/SSR-011, SSR-012]\nvoid check_close_style_uid(void) {\n    return;\n}\n",
+            encoding="utf-8",
+        )
+
+        scanner = SourceScanner(tmp_path)
+        links = scanner.scan()
+
+        assert "SSR-011" in links
+        assert "SSR-012" in links
+
+    def test_scan_mixed_sdoc_and_need_markers_in_same_file(self, tmp_path: Path) -> None:
+        """Test that @sdoc and @need markers in the same file are both captured.
+
+        Guards against a regex regression where one marker type shadows the other
+        when both appear in the same source file.
+        """
+        source_file = tmp_path / "mixed_markers.c"
+        source_file.write_text(
+            "// @sdoc[SSR-020]\n"
+            "void sdoc_function(void) {\n"
+            "    do_something();\n"
+            "}\n"
+            "\n"
+            "// @need[SSR-021]\n"
+            "void need_function(void) {\n"
+            "    do_something_else();\n"
+            "}\n",
+            encoding="utf-8",
+        )
+
+        scanner = SourceScanner(tmp_path)
+        links = scanner.scan()
+
+        assert "SSR-020" in links, "@sdoc marker not captured in mixed file"
+        assert "SSR-021" in links, "@need marker not captured in mixed file"
+        assert links["SSR-020"][0].file_path == source_file
+        assert links["SSR-021"][0].file_path == source_file

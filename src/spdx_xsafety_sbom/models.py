@@ -15,7 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 if TYPE_CHECKING:
     pass
@@ -86,7 +86,20 @@ class StrictDocNode:
     """Path to the source .sdoc document."""
 
     def get_requirement_type(self) -> str:
-        """Infer requirement type from UID prefix."""
+        """Return the semantic requirement type.
+
+        Prefers ``node_type`` when it carries semantic meaning — i.e. when the
+        parser has already mapped the type (e.g. Sphinx-Needs sets ``"HAZ"``,
+        ``"SG"``, etc.).  Falls back to UID-prefix inference for StrictDoc
+        requirements whose ``.sdoc`` file uses the generic ``[REQUIREMENT]``
+        node type, which the StrictDoc grammar does not further differentiate.
+        """
+        # Sphinx-Needs parser always sets a semantic node_type; use it directly.
+        _generic_types = {"REQUIREMENT", "SECTION", "TEXT", "REQ"}
+        if self.node_type and self.node_type not in _generic_types:
+            return self.node_type
+
+        # StrictDoc-style fallback: infer from UID prefix.
         if self.uid.startswith("HAZ"):
             return "HAZ"
         if self.uid.startswith("SG"):
@@ -100,10 +113,10 @@ class StrictDocNode:
         if self.uid.startswith("SWA"):
             return "SWA"
         if self.uid.startswith("TC"):
-            return "TC"  # Test Case
+            return "TC"
         if self.uid.startswith("EVID"):
-            return "EVID"  # Evidence
-        return "REQ"  # Generic requirement
+            return "EVID"
+        return "REQ"
 
 
 @dataclass
@@ -149,38 +162,49 @@ class GeneratorConfig(BaseModel):
     """Configuration for SBOM generation."""
 
     # Input paths
-    strictdoc_export_path: Path = Field(
-        ..., description="Path to StrictDoc directory or .sdoc file"
+    input_path: Path = Field(
+        ...,
+        alias="strictdoc_export_path",
+        description="Path to StrictDoc directory, .sdoc file, or Sphinx-Needs needs.json",
     )
-    source_root: Path | None = Field(
-        None, description="Root path for source code scanning"
+    input_format: Literal["auto", "strictdoc", "sphinx-needs"] = Field(
+        "auto",
+        description="Input format: auto-detect, strictdoc (.sdoc), or sphinx-needs (needs.json)",
     )
+
+    @field_validator("input_format", mode="before")
+    @classmethod
+    def _normalise_input_format(cls, v: object) -> object:
+        """Normalise input_format to lowercase so callers are case-insensitive.
+
+        click.Choice(case_sensitive=False) already does this conversion for CLI
+        users, but Python callers constructing GeneratorConfig directly may pass
+        mixed-case strings (e.g. ``"Sphinx-Needs"``).  Without normalisation
+        Pydantic would reject them with a Literal validation error.
+        """
+        if isinstance(v, str):
+            return v.lower()
+        return v
+
+    source_root: Path | None = Field(None, description="Root path for source code scanning")
 
     # Output configuration
     output_path: Path = Field(..., description="Output file path for SBOM")
-    output_format: Literal["json-ld", "json"] = Field(
-        "json-ld", description="Output format"
-    )
+    output_format: Literal["json-ld", "json"] = Field("json-ld", description="Output format")
 
     # SPDX configuration
-    spdx_id_prefix: str = Field(
-        "urn:spdx:example:", description="Prefix for SPDX element IDs"
-    )
+    spdx_id_prefix: str = Field("urn:spdx:example:", description="Prefix for SPDX element IDs")
     document_name: str = Field("design-sbom", description="Name of the SPDX document")
-    document_namespace: str | None = Field(
-        None, description="Namespace URI for the document"
-    )
+    document_namespace: str | None = Field(None, description="Namespace URI for the document")
 
     # Creator information
     creator_name: str = Field("spdx-xsafety-sbom", description="Tool name")
     creator_org: str | None = Field(None, description="Organization name")
 
     # Feature flags
-    include_source_links: bool = Field(
-        True, description="Include source code range links"
-    )
+    include_source_links: bool = Field(True, description="Include source code range links")
     scan_source_markers: bool = Field(
-        True, description="Scan source files for @sdoc markers"
+        True, description="Scan source files for requirement markers (@sdoc, @need)"
     )
     validate_output: bool = Field(True, description="Validate generated SBOM")
 
@@ -194,7 +218,7 @@ class GeneratorConfig(BaseModel):
         description="Directories to exclude from scanning",
     )
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
 
 # =============================================================================

@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 def generate_design_sbom(
-    strictdoc_export_path: Path | str,
+    input_path: Path | str,
     output_path: Path | str,
     source_root: Path | str | None = None,
     spdx_id_prefix: str = "urn:spdx:example:",
@@ -36,27 +36,33 @@ def generate_design_sbom(
     organization: str | None = None,
     scan_source_markers: bool = True,
     validate_output: bool = True,
+    input_format: str = "auto",
 ) -> GenerationResult:
     """
     Generate an SPDX 3.0.1 Design SBOM with xSafety extensions.
 
     This is the main entry point for SBOM generation. It:
-    1. Parses StrictDoc sources for requirements
-    2. Optionally scans source files for @sdoc markers
+    1. Parses StrictDoc or Sphinx-Needs sources for requirements
+    2. Optionally scans source files for requirement markers (@sdoc, @need)
     3. Builds SPDX 3.0.1 elements with xSafety extensions
     4. Builds relationships (descendantOf, hasTestCase, testedOn, etc.)
     5. Writes JSON-LD output
 
     Args:
-        strictdoc_export_path: Path to StrictDoc directory or .sdoc file.
+        input_path: Path to the requirements source.  Accepts three forms:
+            a StrictDoc directory (containing ``.sdoc`` files), a single
+            ``.sdoc`` file, or a Sphinx-Needs ``needs.json`` export file.
+            Use ``input_format`` to control which parser is selected
+            (default: ``"auto"`` detects from the path).
         output_path: Path for output SBOM file.
         source_root: Optional root path for source code scanning.
         spdx_id_prefix: Prefix for SPDX element IDs.
         document_name: Name for the SPDX document.
         tool_name: Name of the generating tool.
         organization: Optional organization name.
-        scan_source_markers: Whether to scan for @sdoc markers.
+        scan_source_markers: Whether to scan for requirement markers.
         validate_output: Whether to validate generated SBOM.
+        input_format: Input format -- "auto" (detect), "strictdoc", or "sphinx-needs".
 
     Returns:
         GenerationResult with success status and details.
@@ -66,36 +72,47 @@ def generate_design_sbom(
 
     try:
         # Convert paths
-        export_path = Path(strictdoc_export_path)
+        export_path = Path(input_path)
         out_path = Path(output_path)
         src_root = Path(source_root) if source_root else None
 
         logger.info("Starting SBOM generation")
-        logger.info("  StrictDoc source path: %s", export_path)
+        logger.info("  Input path: %s", export_path)
         logger.info("  Output: %s", out_path)
         if src_root:
             logger.info("  Source root: %s", src_root)
 
         # =================================================================
-        # Step 1: Parse StrictDoc source content
+        # Step 1: Parse requirements source content
         # =================================================================
-        logger.info("Parsing StrictDoc sources...")
-        parser = StrictDocParser(export_path)
-        nodes = parser.parse()
+        # Normalise so Python callers are case-insensitive (click does this
+        # automatically for CLI users via case_sensitive=False).
+        fmt = (
+            _detect_input_format(export_path)
+            if input_format.lower() == "auto"
+            else input_format.lower()
+        )
+        logger.info("Parsing requirements (format: %s)...", fmt)
+        if fmt == "sphinx-needs":
+            from spdx_xsafety_sbom.sphinxneeds_parser import SphinxNeedsParser
+
+            nodes = SphinxNeedsParser(export_path).parse()
+        else:
+            nodes = StrictDocParser(export_path).parse()
 
         if not nodes:
-            result.errors.append("No requirements found in StrictDoc sources")
+            result.errors.append("No requirements found in sources")
             return result
 
         logger.info("Found %d requirements", len(nodes))
 
         # =================================================================
-        # Step 2: Scan source files for @sdoc markers
+        # Step 2: Scan source files for requirement markers
         # =================================================================
         source_links: dict[str, list[RangeLink]] = {}
 
         if scan_source_markers and src_root and src_root.exists():
-            logger.info("Scanning source files for @sdoc markers...")
+            logger.info("Scanning source files for requirement markers...")
             scanner = SourceScanner(src_root)
             source_links = scanner.scan()
             logger.info("Found markers for %d UIDs", len(source_links))
@@ -186,9 +203,17 @@ def generate_design_sbom(
         result.errors.append(f"File not found: {e}")
         logger.error("Generation failed: %s", e)
 
-    except Exception as e:
+    except (ValueError, RuntimeError) as e:
+        # Expected failures: bad input format, parser errors, empty sources.
         result.errors.append(f"Generation failed: {e}")
-        logger.exception("Generation failed with exception")
+        logger.error("Generation failed: %s", e)
+
+    except Exception:
+        # Unexpected programming error (e.g. AttributeError from a refactoring
+        # mistake).  Log it and re-raise so it surfaces as a traceback rather
+        # than a silent "Generation failed" message that hides the real cause.
+        logger.exception("Unexpected error during SBOM generation")
+        raise
 
     return result
 
@@ -240,17 +265,40 @@ def _validate_document(document: dict[str, Any]) -> list[str]:
     root_elements = set(spdx_doc.get("rootElement", []))
 
     orphans = element_ids - relationship_refs - root_elements
-    # Filter out creator/tool elements
-    orphans = {
-        oid
-        for oid in orphans
-        if not any(x in oid for x in ["tool-", "org-", "document-"])
-    }
+    # Filter using @type: structural/metadata elements are never requirements.
+    # Using @type is more robust than string-matching on the spdxId prefix.
+    _structural_types = {"Tool", "SpdxDocument", "Relationship", "CreationInfo"}
+    spdx_id_to_type = {e.get("spdxId"): e.get("@type") or e.get("type") for e in graph}
+    orphans = {oid for oid in orphans if spdx_id_to_type.get(oid) not in _structural_types}
 
     if orphans:
         warnings.append(f"Found {len(orphans)} potentially orphan elements")
 
     return warnings
+
+
+def _detect_input_format(path: Path) -> str:
+    """
+    Auto-detect the input format from the given path.
+
+    Returns "sphinx-needs" if the path is (or contains) a needs.json file,
+    "strictdoc" if the directory contains .sdoc files, and defaults to
+    "strictdoc" with a warning otherwise.
+    """
+    if path.is_file() and path.name == "needs.json":
+        return "sphinx-needs"
+    if path.is_dir() and (path / "needs.json").exists():
+        if any(path.rglob("*.sdoc")):
+            logger.warning(
+                "Directory %s contains both needs.json and .sdoc files; "
+                "auto-detecting as sphinx-needs. Use --input-format to override.",
+                path,
+            )
+        return "sphinx-needs"
+    if path.is_dir() and any(path.rglob("*.sdoc")):
+        return "strictdoc"
+    logger.warning("Could not detect input format for %s; defaulting to strictdoc", path)
+    return "strictdoc"
 
 
 def generate_from_config(config: GeneratorConfig) -> GenerationResult:
@@ -264,7 +312,7 @@ def generate_from_config(config: GeneratorConfig) -> GenerationResult:
         GenerationResult with success status and details.
     """
     return generate_design_sbom(
-        strictdoc_export_path=config.strictdoc_export_path,
+        input_path=config.input_path,
         output_path=config.output_path,
         source_root=config.source_root,
         spdx_id_prefix=config.spdx_id_prefix,
@@ -273,4 +321,5 @@ def generate_from_config(config: GeneratorConfig) -> GenerationResult:
         organization=config.creator_org,
         scan_source_markers=config.scan_source_markers,
         validate_output=config.validate_output,
+        input_format=config.input_format,
     )

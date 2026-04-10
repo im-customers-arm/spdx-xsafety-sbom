@@ -182,18 +182,14 @@ class TestSPDX3Builder:
         node = StrictDocNode(uid="SSR-001", statement="Test")
         element = builder.build_node_element(node)
 
-        document = builder.build_document(
-            root_elements=[element["spdxId"]]
-        )
+        document = builder.build_document(root_elements=[element["spdxId"]])
 
         assert "@context" in document
         assert "@graph" in document
         assert len(document["@graph"]) > 0
 
         # Find SpdxDocument
-        spdx_docs = [
-            e for e in document["@graph"] if e.get("@type") == "SpdxDocument"
-        ]
+        spdx_docs = [e for e in document["@graph"] if e.get("@type") == "SpdxDocument"]
         assert len(spdx_docs) == 1
         assert spdx_docs[0]["name"] == "test-doc"
 
@@ -206,7 +202,5 @@ class TestSPDX3Builder:
         builder.build_node_element(node)  # Add same node again
 
         # Should only have one element
-        ssr_elements = [
-            e for e in builder.elements if e.get("name") == "SSR-001"
-        ]
+        ssr_elements = [e for e in builder.elements if e.get("name") == "SSR-001"]
         assert len(ssr_elements) == 1

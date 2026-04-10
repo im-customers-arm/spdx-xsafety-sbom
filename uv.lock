@@ -1453,21 +1453,9 @@ dependencies = [
 [package.optional-dependencies]
 all = [
     { name = "jsonschema" },
-    { name = "mypy" },
-    { name = "pyinstaller" },
     { name = "pyld" },
     { name = "pyshacl" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
     { name = "rdflib" },
-    { name = "ruff" },
-]
-dev = [
-    { name = "mypy" },
-    { name = "pyinstaller" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
 ]
 validation = [
     { name = "jsonschema" },
@@ -1478,31 +1466,36 @@ validation = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "mypy" },
     { name = "pyinstaller" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.1.0" },
     { name = "jsonschema", marker = "extra == 'validation'", specifier = ">=4.0.0" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.10.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
-    { name = "pyinstaller", marker = "extra == 'dev'", specifier = ">=6.0.0" },
     { name = "pyld", marker = "extra == 'validation'", specifier = ">=2.0.0" },
     { name = "pyshacl", marker = "extra == 'validation'", specifier = ">=0.25.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5.0.0" },
     { name = "rdflib", marker = "extra == 'validation'", specifier = ">=7.0.0" },
     { name = "rich", specifier = ">=13.0.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.0" },
     { name = "setuptools", specifier = ">=70.0.0,<75.0.0" },
-    { name = "spdx-xsafety-sbom", extras = ["validation", "dev"], marker = "extra == 'all'" },
+    { name = "spdx-xsafety-sbom", extras = ["validation"], marker = "extra == 'all'" },
     { name = "strictdoc", specifier = ">=0.0.59,<0.1.0" },
 ]
-provides-extras = ["validation", "dev", "all"]
+provides-extras = ["validation", "all"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pyinstaller", specifier = ">=6.0.0" }]
+dev = [
+    { name = "mypy", specifier = ">=1.10.0" },
+    { name = "pyinstaller", specifier = ">=6.0.0" },
+    { name = "pytest", specifier = ">=8.0.0" },
+    { name = "pytest-cov", specifier = ">=5.0.0" },
+    { name = "ruff", specifier = ">=0.4.0" },
+]
 
 [[package]]
 name = "starlette"

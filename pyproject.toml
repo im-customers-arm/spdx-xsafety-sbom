@@ -20,8 +20,7 @@ dependencies = ["setuptools>=70.0.0,<75.0.0", "click>=8.1.0", "rich>=13.0.0", "p
 
 [project.optional-dependencies]
 validation = ["pyshacl>=0.25.0", "rdflib>=7.0.0", "pyld>=2.0.0", "jsonschema>=4.0.0"]
-dev = ["pytest>=8.0.0", "pytest-cov>=5.0.0", "ruff>=0.4.0", "mypy>=1.10.0", "pyinstaller>=6.0.0"]
-all = ["spdx-xsafety-sbom[validation,dev]"]
+all = ["spdx-xsafety-sbom[validation]"]
 
 [project.scripts]
 spdx-xsafety-sbom = "spdx_xsafety_sbom.cli:main"
@@ -48,6 +47,15 @@ known-first-party = ["spdx_xsafety_sbom"]
 python_version = "3.12"
 strict = true
 
+# Overrides for optional validation extras (pyshacl, rdflib).
+# These packages are only present when installed via:
+#   uv sync --extra validation
+# CI runs `uv sync --dev` (no validation extras), so ignore_missing_imports
+# prevents mypy from failing on the uninstalled stubs.
+[[tool.mypy.overrides]]
+module = ["pyshacl.*", "rdflib.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
@@ -58,5 +66,9 @@ filterwarnings = [
 
 [dependency-groups]
 dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
     "pyinstaller>=6.0.0",
 ]

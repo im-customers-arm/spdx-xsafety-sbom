@@ -24,8 +24,14 @@ def sample_strictdoc_export(fixtures_dir: Path) -> Path:
 
 
 @pytest.fixture
+def sample_sphinxneeds_export(fixtures_dir: Path) -> Path:
+    """Path to sample Sphinx-Needs needs.json export."""
+    return fixtures_dir / "sphinxneeds" / "needs.json"
+
+
+@pytest.fixture
 def sample_source_dir(fixtures_dir: Path) -> Path:
-    """Path to sample source files with @sdoc markers."""
+    """Path to sample source files with requirement markers."""
     return fixtures_dir / "source"
 
 

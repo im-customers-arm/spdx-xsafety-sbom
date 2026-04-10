@@ -63,9 +63,7 @@ class RelationshipBuilder:
             SPDX Relationship element.
         """
         self._relationship_count += 1
-        rel_id = self.spdx_builder.make_spdx_id(
-            "relationship", f"rel-{self._relationship_count}"
-        )
+        rel_id = self.spdx_builder.make_spdx_id("relationship", f"rel-{self._relationship_count}")
 
         # Map relationship type to SPDX vocabulary
         spdx_rel_type = RELATIONSHIP_TYPES.get(relationship_type, relationship_type)
@@ -147,9 +145,7 @@ class RelationshipBuilder:
 
         # Find test cases (TC-* nodes)
         test_cases = {
-            uid: node
-            for uid, node in nodes.items()
-            if node.get_requirement_type() == "TC"
+            uid: node for uid, node in nodes.items() if node.get_requirement_type() == "TC"
         }
 
         for tc_uid, tc_node in test_cases.items():
@@ -188,9 +184,7 @@ class RelationshipBuilder:
 
         # Find evidence nodes (EVID-*)
         evidence_nodes = {
-            uid: node
-            for uid, node in nodes.items()
-            if node.get_requirement_type() == "EVID"
+            uid: node for uid, node in nodes.items() if node.get_requirement_type() == "EVID"
         }
 
         for evid_uid, evid_node in evidence_nodes.items():
@@ -203,13 +197,9 @@ class RelationshipBuilder:
 
                     # Use element or evidence prefix based on parent type
                     if parent_type == "EVID":
-                        parent_spdx_id = self.spdx_builder.make_spdx_id(
-                            "evidence", parent_uid
-                        )
+                        parent_spdx_id = self.spdx_builder.make_spdx_id("evidence", parent_uid)
                     else:
-                        parent_spdx_id = self.spdx_builder.make_spdx_id(
-                            "element", parent_uid
-                        )
+                        parent_spdx_id = self.spdx_builder.make_spdx_id("element", parent_uid)
 
                     rel = self.build_relationship(
                         from_id=parent_spdx_id,
@@ -256,10 +246,7 @@ class RelationshipBuilder:
                     from_id=req_spdx_id,
                     to_ids=[file_spdx_id],
                     relationship_type="testedOn",
-                    comment=(
-                        f"{uid} implemented in {file_name}:"
-                        f"{link.line_start}-{link.line_end}"
-                    ),
+                    comment=(f"{uid} implemented in {file_name}:{link.line_start}-{link.line_end}"),
                 )
                 relationships.append(rel)
 
@@ -296,9 +283,7 @@ class RelationshipBuilder:
 
         # Build source relationships if markers provided
         if source_links:
-            all_relationships.extend(
-                self.build_source_relationships(source_links, source_root)
-            )
+            all_relationships.extend(self.build_source_relationships(source_links, source_root))
 
         logger.info("Built %d total relationships", len(all_relationships))
         return all_relationships

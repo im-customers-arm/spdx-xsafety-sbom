@@ -101,9 +101,7 @@ class SPDX3Builder:
             creators.append(
                 {
                     "type": "Organization",
-                    "spdxId": self.make_spdx_id(
-                        "org", organization.lower().replace(" ", "-")
-                    ),
+                    "spdxId": self.make_spdx_id("org", organization.lower().replace(" ", "-")),
                     "name": organization,
                 }
             )

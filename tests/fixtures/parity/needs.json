@@ -1,0 +1,55 @@
+{
+  "created": "2026-04-10T00:00:00Z",
+  "current_version": "",
+  "project": "parity-test",
+  "versions": {
+    "": {
+      "needs": {
+        "HAZ-001": {
+          "id": "HAZ-001",
+          "type": "hazard",
+          "title": "Missing CAM message not detected",
+          "content": "Missing CAM message not detected within timeout period",
+          "derived_from": []
+        },
+        "SG-001": {
+          "id": "SG-001",
+          "type": "safety_goal",
+          "title": "CAM timeout detection",
+          "content": "Ensure CAM message reception is monitored with timeout detection",
+          "derived_from": ["HAZ-001"]
+        },
+        "SSR-001": {
+          "id": "SSR-001",
+          "type": "ssr",
+          "title": "Timer scheduling",
+          "content": "cam-service shall schedule a per-event timer",
+          "derived_from": ["SG-001"]
+        },
+        "TC-001": {
+          "id": "TC-001",
+          "type": "test_case",
+          "title": "Test timer trigger",
+          "content": "Verify timer triggers on missing CAM message",
+          "derived_from": ["SSR-001"]
+        },
+        "EVID-001": {
+          "id": "EVID-001",
+          "type": "evidence",
+          "title": "Temporal fault evidence",
+          "content": "Logs for temporal fault case",
+          "derived_from": ["TC-001"]
+        }
+      },
+      "needs_schema": {
+        "properties": {
+          "id": {"field_type": "core"},
+          "title": {"field_type": "core"},
+          "content": {"field_type": "core"},
+          "type": {"field_type": "core"},
+          "derived_from": {"field_type": "links"}
+        }
+      }
+    }
+  }
+}
