@@ -62,12 +62,21 @@ from typing import Any
 
 from spdx_xsafety_sbom.models import StrictDocNode
 
+__all__ = ["SphinxNeedsParser"]
+
 logger = logging.getLogger(__name__)
 
 # Fallback set of forward link field names used when the needs.json
 # contains no ``needs_schema`` (older Sphinx-Needs exports).
 # When a schema IS present the parser reads ALL ``field_type: "links"``
 # fields dynamically, so custom link types are captured automatically.
+#
+# Note on ``parent_needs``: this is a first-class Sphinx-Needs feature for
+# hierarchical document structures, but projects do not always declare it as a
+# link field in ``needs_extra_links`` (conf.py), so it may be absent from the
+# ``needs_schema``.  It is included here so the fallback path (no schema) still
+# picks it up.  When a schema IS present it will only be collected if the project
+# explicitly declares ``parent_needs`` as ``field_type: "links"``.
 _PARENT_LINK_FIELDS: tuple[str, ...] = (
     "derived_from",  # HAZ → SG, SG → TSR, etc.
     "links",  # generic forward links
@@ -322,7 +331,8 @@ class SphinxNeedsParser:
 
         if uid in nodes:
             logger.warning(
-                "Duplicate need id %r — skipping second occurrence (dict key %r)",
+                "Duplicate need id %r — skipping second occurrence "
+                "(dict key %r maps to the same id; first occurrence wins)",
                 uid,
                 need_id,
             )
@@ -424,6 +434,11 @@ class SphinxNeedsParser:
             if not raw_value:
                 continue
             # Values may be a list[str] or a comma-separated string.
+            # Sphinx-Needs normally emits link fields as JSON arrays; the
+            # comma-separated string form is a legacy / hand-authored export
+            # compatibility path.  Sphinx-Needs UIDs may not contain commas
+            # (they follow ``[A-Z][A-Z0-9_]*-\d+`` convention), so splitting
+            # on "," is safe in practice.
             if isinstance(raw_value, list):
                 items = raw_value
             else:

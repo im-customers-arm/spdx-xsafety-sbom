@@ -156,7 +156,9 @@ class TestSphinxNeedsParser:
         with pytest.raises(ValueError, match="missing top-level 'versions' key"):
             parser.parse()
 
-    def test_parse_falls_back_to_first_version(self, tmp_path: Path) -> None:
+    def test_parse_falls_back_to_first_version(
+        self, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test parser uses first version when current_version is not present."""
         needs_path = tmp_path / "needs.json"
         payload = {
@@ -177,11 +179,15 @@ class TestSphinxNeedsParser:
         }
         needs_path.write_text(json.dumps(payload), encoding="utf-8")
 
-        parser = SphinxNeedsParser(needs_path)
-        nodes = parser.parse()
+        with caplog.at_level(logging.WARNING, logger="spdx_xsafety_sbom.sphinxneeds_parser"):
+            parser = SphinxNeedsParser(needs_path)
+            nodes = parser.parse()
 
         assert "REQ-1" in nodes
         assert nodes["REQ-1"].node_type == "REQUIREMENT"
+        assert any(
+            "current_version" in r.message and "falling back" in r.message for r in caplog.records
+        )
 
     def test_infer_node_type_empty_type_uses_default(self) -> None:
         """Test empty type string falls back to default node type."""

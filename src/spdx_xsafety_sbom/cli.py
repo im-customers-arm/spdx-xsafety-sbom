@@ -208,7 +208,7 @@ def generate(
     # Generate SBOM
     with console.status("[bold green]Generating SBOM..."):
         result = generate_design_sbom(
-            strictdoc_export_path=input_path,
+            input_path=input_path,
             output_path=output,
             source_root=effective_source_root,
             spdx_id_prefix=prefix,

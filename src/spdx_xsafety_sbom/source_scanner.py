@@ -126,6 +126,10 @@ class SourceScanner:
 
             for match in matches:
                 raw_uids = [part.strip() for part in match.split(",")]
+                # Strip a leading "/" to handle closing-tag-style UID syntax
+                # (@need[/SSR-011] or @sdoc[/SSR-011]).  UIDs in this project
+                # follow [A-Z][A-Z0-9_]*-\d+ and never start with "/", so this
+                # is safe; a comment here avoids future confusion about the intent.
                 uids = [uid.lstrip("/") for uid in raw_uids if uid.strip()]
                 if not uids:
                     continue

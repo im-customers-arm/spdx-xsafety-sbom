@@ -58,7 +58,7 @@ class TestGenerateDesignSbom:
         export_path = fixtures_dir / "sdoc"
 
         result = generate_design_sbom(
-            strictdoc_export_path=export_path,
+            input_path=export_path,
             output_path=tmp_output,
             scan_source_markers=False,
             validate_output=True,
@@ -82,7 +82,7 @@ class TestGenerateDesignSbom:
         source_path = fixtures_dir / "source"
 
         result = generate_design_sbom(
-            strictdoc_export_path=export_path,
+            input_path=export_path,
             output_path=tmp_output,
             source_root=source_path,
             scan_source_markers=True,
@@ -106,7 +106,7 @@ class TestGenerateDesignSbom:
         output_path = tmp_path / "subdir" / "nested" / "output.json"
 
         result = generate_design_sbom(
-            strictdoc_export_path=export_path,
+            input_path=export_path,
             output_path=output_path,
             scan_source_markers=False,
         )
@@ -120,7 +120,7 @@ class TestGenerateDesignSbom:
         export_path = fixtures_dir / "sdoc"
 
         result = generate_design_sbom(
-            strictdoc_export_path=export_path,
+            input_path=export_path,
             output_path=tmp_output,
             spdx_id_prefix="urn:custom:prefix:",
             scan_source_markers=False,
@@ -140,7 +140,7 @@ class TestGenerateDesignSbom:
     def test_generate_missing_export_path(self, tmp_path: Path) -> None:
         """Test error handling for missing export path."""
         result = generate_design_sbom(
-            strictdoc_export_path=tmp_path / "nonexistent",
+            input_path=tmp_path / "nonexistent",
             output_path=tmp_path / "output.json",
         )
 
@@ -153,7 +153,7 @@ class TestGenerateDesignSbom:
         empty_dir.mkdir()
 
         result = generate_design_sbom(
-            strictdoc_export_path=empty_dir,
+            input_path=empty_dir,
             output_path=tmp_path / "output.json",
         )
 
@@ -165,7 +165,7 @@ class TestGenerateDesignSbom:
         export_path = fixtures_dir / "sdoc"
 
         result = generate_design_sbom(
-            strictdoc_export_path=export_path,
+            input_path=export_path,
             output_path=tmp_output,
             scan_source_markers=False,
         )
@@ -179,7 +179,7 @@ class TestGenerateDesignSbom:
     ) -> None:
         """Test generating an SBOM from a Sphinx-Needs needs.json export."""
         result = generate_design_sbom(
-            strictdoc_export_path=sample_sphinxneeds_export,
+            input_path=sample_sphinxneeds_export,
             output_path=tmp_output,
             scan_source_markers=False,
             validate_output=True,
@@ -191,20 +191,13 @@ class TestGenerateDesignSbom:
         assert tmp_output.exists()
 
     def test_generate_from_sphinxneeds_with_need_markers(
-        self, sample_sphinxneeds_export: Path, tmp_path: Path, tmp_output: Path
+        self, sample_sphinxneeds_export: Path, sample_source_dir: Path, tmp_output: Path
     ) -> None:
         """Test generating from Sphinx-Needs input with @need marker scanning."""
-        source_root = tmp_path / "source"
-        source_root.mkdir()
-        (source_root / "cam_service_need.c").write_text(
-            "// @need[SSR-001]\nvoid schedule_timeout_timer(void) {\n    trigger_alarm();\n}\n",
-            encoding="utf-8",
-        )
-
         result = generate_design_sbom(
-            strictdoc_export_path=sample_sphinxneeds_export,
+            input_path=sample_sphinxneeds_export,
             output_path=tmp_output,
-            source_root=source_root,
+            source_root=sample_source_dir,
             scan_source_markers=True,
             validate_output=True,
             input_format="sphinx-needs",
@@ -219,9 +212,11 @@ class TestGenerateDesignSbom:
         tested_on_rels = [r for r in relationships if r.get("relationshipType") == "testedOn"]
         assert tested_on_rels
 
-    def test_detect_input_format(self, fixtures_dir: Path, sample_sphinxneeds_export: Path) -> None:
+    def test_detect_input_format(
+        self, sample_strictdoc_export: Path, sample_sphinxneeds_export: Path
+    ) -> None:
         """Test input format auto-detection for both supported formats."""
-        assert _detect_input_format(fixtures_dir / "sdoc") == "strictdoc"
+        assert _detect_input_format(sample_strictdoc_export) == "strictdoc"
         assert _detect_input_format(sample_sphinxneeds_export) == "sphinx-needs"
 
     def test_generate_from_config_with_input_path(
@@ -261,14 +256,14 @@ class TestGenerateDesignSbom:
         sphinxneeds_output = tmp_path / "sphinxneeds.json"
 
         strictdoc_result = generate_design_sbom(
-            strictdoc_export_path=fixtures_dir / "sdoc",
+            input_path=fixtures_dir / "sdoc",
             output_path=strictdoc_output,
             scan_source_markers=False,
             validate_output=False,
             input_format="strictdoc",
         )
         sphinxneeds_result = generate_design_sbom(
-            strictdoc_export_path=fixtures_dir / "sphinxneeds" / "needs.json",
+            input_path=fixtures_dir / "sphinxneeds" / "needs.json",
             output_path=sphinxneeds_output,
             scan_source_markers=False,
             validate_output=False,
@@ -304,3 +299,53 @@ class TestGenerateDesignSbom:
         }
         assert expected_relationships <= strictdoc_relationships
         assert expected_relationships <= sphinxneeds_relationships
+
+    def test_parser_output_parity_matched_fixtures(
+        self, fixtures_dir: Path, tmp_path: Path
+    ) -> None:
+        """Verify StrictDoc and Sphinx-Needs produce identical element and relationship sets.
+
+        Uses a matched fixture pair under tests/fixtures/parity/ where both
+        formats express the same five nodes (HAZ → SG → SSR ← TC ← EVID) with
+        no extra fields, so the generators are expected to produce byte-for-byte
+        identical element types and relationship graphs.
+        """
+        parity_dir = fixtures_dir / "parity"
+        strictdoc_output = tmp_path / "parity-strictdoc.json"
+        sphinxneeds_output = tmp_path / "parity-sphinxneeds.json"
+
+        strictdoc_result = generate_design_sbom(
+            input_path=parity_dir / "sdoc",
+            output_path=strictdoc_output,
+            scan_source_markers=False,
+            validate_output=False,
+            input_format="strictdoc",
+        )
+        sphinxneeds_result = generate_design_sbom(
+            input_path=parity_dir / "needs.json",
+            output_path=sphinxneeds_output,
+            scan_source_markers=False,
+            validate_output=False,
+            input_format="sphinx-needs",
+        )
+
+        assert strictdoc_result.success
+        assert sphinxneeds_result.success
+
+        with open(strictdoc_output, encoding="utf-8") as f:
+            strictdoc_document = json.load(f)
+        with open(sphinxneeds_output, encoding="utf-8") as f:
+            sphinxneeds_document = json.load(f)
+
+        strictdoc_elements, strictdoc_relationships = _extract_graph_elements_by_name(
+            strictdoc_document
+        )
+        sphinxneeds_elements, sphinxneeds_relationships = _extract_graph_elements_by_name(
+            sphinxneeds_document
+        )
+
+        # Both parsers must produce exactly the same element set (by UID → SPDX type).
+        assert strictdoc_elements == sphinxneeds_elements
+
+        # Both parsers must produce exactly the same relationship set.
+        assert strictdoc_relationships == sphinxneeds_relationships

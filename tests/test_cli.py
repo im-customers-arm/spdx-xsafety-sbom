@@ -63,7 +63,7 @@ class TestCli:
         )
 
         assert result.exit_code == 0
-        assert captured["strictdoc_export_path"] == sample_sphinxneeds_export
+        assert captured["input_path"] == sample_sphinxneeds_export
         assert captured["input_format"] == "sphinx-needs"
         assert captured["scan_source_markers"] is False
         assert captured["validate_output"] is False

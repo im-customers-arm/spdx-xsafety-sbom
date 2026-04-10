@@ -1,0 +1,39 @@
+[DOCUMENT]
+TITLE: Parity Test Requirements
+
+[REQUIREMENT]
+UID: HAZ-001
+TITLE: Missing CAM message not detected
+STATEMENT: Missing CAM message not detected within timeout period
+
+[REQUIREMENT]
+UID: SG-001
+TITLE: CAM timeout detection
+STATEMENT: Ensure CAM message reception is monitored with timeout detection
+RELATIONS:
+- TYPE: Parent
+  VALUE: HAZ-001
+
+[REQUIREMENT]
+UID: SSR-001
+TITLE: Timer scheduling
+STATEMENT: cam-service shall schedule a per-event timer
+RELATIONS:
+- TYPE: Parent
+  VALUE: SG-001
+
+[REQUIREMENT]
+UID: TC-001
+TITLE: Test timer trigger
+STATEMENT: Verify timer triggers on missing CAM message
+RELATIONS:
+- TYPE: Parent
+  VALUE: SSR-001
+
+[REQUIREMENT]
+UID: EVID-001
+TITLE: Temporal fault evidence
+STATEMENT: Logs for temporal fault case
+RELATIONS:
+- TYPE: Parent
+  VALUE: TC-001
